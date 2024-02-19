@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+    <link rel="stylesheet" href="~/css/login.css" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginTab = document.getElementById('login-tab');
+            const registerTab = document.getElementById('register-tab');
+            const loginContent = document.getElementById('login-content');
+            const registerContent = document.getElementById('register-content');
+            const msgError = document.getElementById('msgError');
+
+            loginTab.addEventListener('click', function () {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginContent.style.display = 'block';
+                registerContent.style.display = 'none';
+                if (msgError)
+                    msgError.style.display = 'none';
+            });
+
+            registerTab.addEventListener('click', function () {
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                registerContent.style.display = 'block';
+                loginContent.style.display = 'none';
+                if (msgError)
+                    msgError.style.display = 'none';
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="split-container">
+        <div class="left-panel">
+            <img src="/images/nature-home.jpg" style="height: 100%;">
+        </div>
+        <div class="right-panel">
+            <div class="logoImg">
+                <div class="leaf"></div>
+                <div class="leaf"></div>
+                <div class="stem"></div>
+            </div>
+            <div class="logoText">Green Life</div>
+            <div class="slogan">It starts with you</div>
+            <div id="tabs">
+                <button id="login-tab" class="tab-btn @(ViewBag.ActiveTab == "register" ? "" : "active")">Login</button>
+                <button id="register-tab" class="tab-btn @(ViewBag.ActiveTab == "register" ? "active" : "")">Register</button>
+            </div>
+            <div id="login-content" class="tab-content @(ViewBag.ActiveTab == "register" ? "hidden" : "")">
+                <form asp-controller="Home" asp-action="Login" method="post">
+                    <div>
+                        <label>Email:</label>
+                        <input type="email" name="Email" required />
+                    </div>
+                    <div>
+                        <label>Password:</label>
+                        <input type="password" name="Password" required />
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+            <div id="register-content" class="tab-content @(ViewBag.ActiveTab == "register" ? "" : "hidden")">
+                <form asp-controller="Home" asp-action="Register" method="post">
+                    <div>
+                        <label>Email:</label>
+                        <input type="email" name="Email" required />
+                    </div>
+                    <div>
+                        <label>Password:</label>
+                        <input type="password" name="Password" required />
+                    </div>
+                    <div>
+                        <label>Confirm Password:</label>
+                        <input type="password" name="ConfirmPassword" required />
+                    </div>
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <div id="msgError" class="alert alert-danger" style="margin-top: 10px; width: 300px; text-align: center;">
+                    @ViewData["ErrorMessage"]
+                </div>
+            }
+        </div>
+    </div>
+</body>

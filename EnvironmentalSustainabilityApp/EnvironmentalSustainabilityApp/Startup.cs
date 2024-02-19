@@ -62,7 +62,7 @@ namespace EnvironmentalSustainabilityApp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=LoginPage}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

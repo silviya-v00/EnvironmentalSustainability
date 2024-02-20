@@ -31,13 +31,14 @@ namespace EnvironmentalSustainabilityApp
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -65,6 +66,27 @@ namespace EnvironmentalSustainabilityApp
                     pattern: "{controller=Home}/{action=LoginPage}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            CreateUserRoles(serviceProvider).Wait();
+        }
+
+        private async Task CreateUserRoles(IServiceProvider serviceProvider)
+        {
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var roles = new List<string>()
+            {
+                "ADMIN","REGULARUSER"
+            };
+            IdentityResult roleResult;
+
+            foreach (var role in roles)
+            {
+                var roleCheck = await RoleManager.RoleExistsAsync(role);
+                if (!roleCheck)
+                {
+                    roleResult = await RoleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
         }
     }
 }

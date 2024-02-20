@@ -66,11 +66,18 @@ namespace EnvironmentalSustainabilityApp.Controllers
                 return View("LoginPage", ViewBag.ActiveTab = "register");
             }
 
+            if (password != confirmPassword)
+            {
+                ViewData["ErrorMessage"] = "Password and confirmed password do not match.";
+                return View("LoginPage", ViewBag.ActiveTab = "register");
+            }
+
             var newUser = new IdentityUser { UserName = email, Email = email };
             var result = await _userManager.CreateAsync(newUser, password);
 
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(newUser, "REGULARUSER");
                 await _signInManager.SignInAsync(newUser, isPersistent: false);
                 return RedirectToAction("Index", "Home");
             }

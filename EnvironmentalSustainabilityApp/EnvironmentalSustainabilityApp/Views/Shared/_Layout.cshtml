@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EnvironmentalSustainabilityApp</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="icon" type="image/x-icon" href="/images/leaf-favicon.ico">
@@ -41,11 +41,11 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer text-muted">
         @if (SignInManager.IsSignedIn(User))
         {
-            <div class="container">
-                &copy; 2024 - EnvironmentalSustainabilityApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="container" style="display: flex; justify-content: center; align-items: center;">
+                &copy; @DateTime.Now.Year - Green Life
             </div>
         }
     </footer>

@@ -7,9 +7,8 @@ a.navbar-brand {
   word-break: break-all;
 }
 
-/* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    color: #fff;
 }
 
 .btn-primary {
@@ -18,11 +17,18 @@ a {
   border-color: #1861ac;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.nav-pills .nav-link {
+    color: #fff;
+    background-color: #6ab04c;
+    border-color: #6ab04c;
+    margin-bottom: 5px;
 }
+
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+        color: #fff;
+        background-color: #3d8f3d;
+        border-color: #3d8f3d;
+    }
 
 /* Sticky footer styles
 -------------------------------------------------- */
@@ -59,13 +65,27 @@ html {
 }
 
 body {
-  /* Margin bottom by footer height */
   margin-bottom: 60px;
 }
+
 .footer {
   position: absolute;
   bottom: 0;
   width: 100%;
   white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+  line-height: 60px;
 }
+
+button {
+    cursor: pointer;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px 5px 0 0;
+    background-color: #6ab04c !important;
+    color: #fff !important;
+    transition: background-color 0.3s;
+}
+
+     button.active {
+        background-color: #3d8f3d;
+    }

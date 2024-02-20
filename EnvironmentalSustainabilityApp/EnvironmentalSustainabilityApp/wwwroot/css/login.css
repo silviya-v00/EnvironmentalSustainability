@@ -10,8 +10,6 @@ body {
     display: flex;
     flex-direction: row;
     height: 700px;
-    margin-top: 20px;
-    background-color: #fff;
     border-radius: 10px;
     overflow: hidden;
 }
@@ -117,6 +115,7 @@ body {
     }
 
     .tab-content input[type="email"],
+    .tab-content input[type="text"],
     .tab-content input[type="password"] {
         width: 100%;
         padding: 10px;

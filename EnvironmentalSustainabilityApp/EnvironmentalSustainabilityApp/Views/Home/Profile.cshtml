@@ -1,0 +1,103 @@
+﻿@{
+    ViewData["Title"] = "Profile";
+}
+
+<div style="padding: 20px;">
+    <h2 style="text-align: center;">Manage your account</h2>
+    <div>
+        <hr>
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "ChangePassword" ? "" : "active")" id="profile" href="#">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "ChangePassword" ? "active" : "")" id="change-password" href="#">Password</a></li>
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <div id="profile-div" style="@(ViewContext.RouteData.Values["action"].ToString() == "ChangePassword" ? "display: none;" : "display: block;")">
+                    <h4>Profile</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form id="profile-form" method="post" asp-controller="Home" asp-action="UpdateProfile" novalidate="novalidate">
+                                <div class="text-danger validation-summary-valid profile-msg">
+                                    @Html.ValidationSummary(true)
+                                </div>
+                                <div class="form-group">
+                                    <label for="Username">Username</label>
+                                    <input class="form-control" type="text" id="Username" name="username" value="@ViewBag.Username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="Input_NewEmail">New email</label>
+                                    <input class="form-control" type="email" data-val="true" data-val-email="The New email field is not a valid e-mail address." data-val-required="The New email field is required." id="Input_NewEmail" name="newEmail" value="@ViewBag.Email">
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="newEmail" data-valmsg-replace="true"></span>
+                                </div>
+                                <button id="update-profile-button" type="submit" class="btn">Save</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="change-password-div" style="@(ViewContext.RouteData.Values["action"].ToString() == "ChangePassword" ? "display: block;" : "display: none;")">
+                    <h4>Change password</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form id="change-password-form" method="post" asp-controller="Home" asp-action="ChangePassword" novalidate="novalidate">
+                                <div class="text-danger validation-summary-valid profile-msg">
+                                    @Html.ValidationSummary(true)
+                                </div>
+                                <div class="form-group">
+                                    <label for="Input_OldPassword">Current password</label>
+                                    <input class="form-control" type="password" data-val="true" data-val-required="The Current password field is required." id="Input_OldPassword" name="oldPassword">
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="oldPassword" data-valmsg-replace="true"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Input_NewPassword">New password</label>
+                                    <input class="form-control" type="password" data-val="true" data-val-length="The New password must be at least 6 and at max 100 characters long." data-val-length-max="100" data-val-length-min="6" data-val-required="The New password field is required." id="Input_NewPassword" maxlength="100" name="newPassword">
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="newPassword" data-valmsg-replace="true"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Input_ConfirmPassword">Confirm new password</label>
+                                    <input class="form-control" type="password" data-val="true" data-val-equalto="The new password and confirmation password do not match." data-val-equalto-other="*.newPassword" id="Input_ConfirmPassword" name="confirmPassword">
+                                    <span class="text-danger field-validation-valid" data-valmsg-for="confirmPassword" data-valmsg-replace="true"></span>
+                                </div>
+                                <button type="submit" class="btn">Update password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const profileLink = document.getElementById('profile');
+            const passwordLink = document.getElementById('change-password');
+            const profileDiv = document.getElementById('profile-div');
+            const passwordDiv = document.getElementById('change-password-div');
+            const profileMsg = document.querySelector('.profile-msg');
+
+            profileLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                profileDiv.style.display = 'block';
+                passwordDiv.style.display = 'none';
+                profileLink.classList.add('active');
+                passwordLink.classList.remove('active');
+                if (profileMsg)
+                    profileMsg.remove();
+            });
+
+            passwordLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                profileDiv.style.display = 'none';
+                passwordDiv.style.display = 'block';
+                profileLink.classList.remove('active');
+                passwordLink.classList.add('active');
+                if (profileMsg)
+                    profileMsg.remove();
+            });
+        });
+    </script>
+}

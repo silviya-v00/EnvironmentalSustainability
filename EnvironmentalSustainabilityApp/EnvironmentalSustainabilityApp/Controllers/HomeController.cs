@@ -1,4 +1,5 @@
 ﻿using EnvironmentalSustainabilityApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace EnvironmentalSustainabilityApp.Controllers
@@ -40,10 +42,24 @@ namespace EnvironmentalSustainabilityApp.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Login(string email, string password)
+        public async Task<IActionResult> Profile()
         {
-            var result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
+            var userName = User.Identity.Name;
+            var existingUser = await _userManager.FindByNameAsync(userName);
+
+            if (existingUser != null)
+            {
+                ViewBag.Username = existingUser.UserName;
+                ViewBag.Email = existingUser.Email;
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(string userName, string password)
+        {
+            var result = await _signInManager.PasswordSignInAsync(userName, password, false, lockoutOnFailure: false);
 
             if (result.Succeeded)
             {
@@ -86,6 +102,67 @@ namespace EnvironmentalSustainabilityApp.Controllers
                 ViewData["ErrorMessage"] = "Registration failed. Please try again.";
                 return View("LoginPage", ViewBag.ActiveTab = "register");
             }
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile(string username, string newEmail)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            if (user != null)
+            {
+                user.UserName = username;
+                user.Email = newEmail;
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    ViewBag.Username = username;
+                    ViewBag.Email = newEmail;
+                    return View("Profile");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+            }
+
+            return View("Profile");
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
+        {
+            if (newPassword != confirmPassword)
+            {
+                ModelState.AddModelError("", "The new password and confirmation password do not match.");
+                return View("Profile");
+            }
+
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            if (user != null && !String.IsNullOrEmpty(oldPassword) && !String.IsNullOrEmpty(newPassword) && !String.IsNullOrEmpty(confirmPassword))
+            {
+                var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+
+                if (result.Succeeded)
+                {
+                    return View("Profile");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+            }
+
+            return View("Profile");
         }
 
         public IActionResult Privacy()

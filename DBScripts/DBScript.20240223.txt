@@ -1,0 +1,16 @@
+USE [EnvironmentalSustainability]
+GO
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
+               WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'FeaturedContent')
+BEGIN
+	CREATE TABLE dbo.FeaturedContent (
+		ContentID int IDENTITY(1,1) PRIMARY KEY,
+		ContentTitle nvarchar(max),
+		ContentDescription nvarchar(max),
+		ContentLink nvarchar(max),
+		ContentImageFileName nvarchar(max),
+		IsContentActive bit
+	)
+END
+GO

@@ -7,17 +7,62 @@
     <div>
         <hr>
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-3" id="content-menu">
                 <ul class="nav nav-pills flex-column">
-                    <li class="nav-item"><a class="nav-link active" id="profile" href="#">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" id="change-password" href="#">Password</a></li>
+                    <li class="nav-item"><a class="nav-link active" id="add-new-content" href="#">Add New Content</a></li>
                 </ul>
+                <div style="margin: 20px 0 5px 0;">Content List:</div>
+                <div id="content-list-container" style="max-height: 325px; overflow-y: auto; padding-right: 10px;">
+                    <ul id="content-list" class="nav nav-pills flex-column">
+                    </ul>
+                </div>
             </div>
-            <div class="col-md-9">
+            <div class="col-md-9" id="content-details" style="padding: 0 80px 0 80px;">
+                <form id="content-form" method="post" asp-controller="Home" asp-action="SaveContent" novalidate="novalidate">
+                    <div class="text-danger validation-summary-valid content-msg">
+                        @Html.ValidationSummary(true)
+                    </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="ContentImage">Content Image</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="ContentImage" name="ContentImage" accept="image/*">
+                                    <label class="custom-file-label" for="ContentImage">Choose file</label>
+                                </div>
+                                <img id="selected-image" src="#" alt="Selected Image" style="max-width: 100%; max-height: 200px; margin-top: 10px; display: none;">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <label for="ContentTitle">Content Title</label>
+                                <input class="form-control" type="text" id="ContentTitle" name="ContentTitle" maxlength="100">
+                                <small class="text-muted">Max 100 characters</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="ContentDescription">Content Description</label>
+                                <textarea class="form-control" id="ContentDescription" name="ContentDescription" maxlength="300"></textarea>
+                                <small class="text-muted">Max 300 characters</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="ContentLink">Content Link</label>
+                                <input class="form-control" type="text" id="ContentLink" name="ContentLink">
+                            </div>
+                            <div class="form-group">
+                                <label for="IsContentActive">Is Content Active?</label>
+                                <input type="checkbox" id="IsContentActive" name="IsContentActive" checked>
+                            </div>
+                            <button id="save-content" type="submit" class="btn">Save</button>
+                            <button id="delete-content" type="button" class="btn">Delete</button>
+                        </div>
+                    </div>
+                </form>
             </div>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/js/content-management.js" asp-append-version="true"></script>
 }

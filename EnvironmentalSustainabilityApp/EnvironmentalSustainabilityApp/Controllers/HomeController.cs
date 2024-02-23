@@ -1,11 +1,14 @@
 ﻿using EnvironmentalSustainabilityApp.Models;
+using EnvironmentalSustainabilityApp.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,14 +18,19 @@ namespace EnvironmentalSustainabilityApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
+        private DBUtil _dbUtil;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
 
         public HomeController(ILogger<HomeController> logger,
+                              IConfiguration configuration,
                               SignInManager<IdentityUser> signInManager,
                               UserManager<IdentityUser> userManager)
         {
             _logger = logger;
+            _configuration = configuration;
+            _dbUtil = new DBUtil(_configuration.GetConnectionString("DefaultConnection"));
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -181,6 +189,64 @@ namespace EnvironmentalSustainabilityApp.Controllers
             }
 
             return View("Profile");
+        }
+
+        [HttpGet]
+        public IActionResult GetContentList()
+        {
+            var contentList = _dbUtil.GetContentListFromDatabase();
+
+            return Json(contentList);
+        }
+
+        [HttpGet]
+        public IActionResult GetContentDetails(int contentId)
+        {
+            var content = _dbUtil.GetContentDetailsFromDatabase(contentId);
+
+            return Json(content);
+        }
+
+        [HttpGet]
+        public IActionResult GetContentImage(string fileName)
+        {
+            string imageFolderPath = _configuration["ImageFolderPath"];
+            string imagePath = Path.Combine(imageFolderPath, fileName);
+
+            if (System.IO.File.Exists(imagePath))
+            {
+                var imageBytes = System.IO.File.ReadAllBytes(imagePath);
+                return File(imageBytes, "image/jpeg");
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        public IActionResult SaveContent([FromForm] FeaturedContent content)
+        {
+            string imageFolderPath = _configuration["ImageFolderPath"];
+
+            if (content.ContentImage != null && content.ContentImage.Length > 0)
+            {
+                content.ContentImageFileName = Guid.NewGuid().ToString() + ".jpg";
+
+                string imagePath = Path.Combine(imageFolderPath, content.ContentImageFileName);
+                using (var fileStream = new FileStream(imagePath, FileMode.Create))
+                {
+                    content.ContentImage.CopyTo(fileStream);
+                }
+            }
+
+            _dbUtil.SaveContentToDatabase(content);
+            return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult DeleteContent(int contentId)
+        {
+            _dbUtil.DeleteContentFromDatabase(contentId, _configuration["ImageFolderPath"]);
+            return Ok();
         }
 
         public IActionResult Privacy()

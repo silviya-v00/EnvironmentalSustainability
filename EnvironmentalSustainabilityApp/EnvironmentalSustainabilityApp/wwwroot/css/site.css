@@ -23,12 +23,54 @@ a {
     background-color: #6ab04c;
     border-color: #6ab04c;
     margin-bottom: 5px;
+    min-height: 40px;
 }
 
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
         color: #fff;
         background-color: #3d8f3d;
         border-color: #3d8f3d;
+    }
+
+.custom-file-input::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+.custom-file-input::before {
+    content: 'Choose file';
+    display: inline-block;
+    background: linear-gradient(top, #f9f9f9, #e3e3e3);
+    border: 1px solid #999;
+    border-radius: 3px;
+    padding: 5px 8px;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    text-align: center;
+}
+
+.custom-file-input:hover::before {
+    border-color: black;
+}
+
+.custom-file-input:active::before {
+    background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+}
+
+#content-list-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+#content-list-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#content-list-container::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+    #content-list-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
     }
 
 /* Sticky footer styles

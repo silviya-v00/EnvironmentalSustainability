@@ -1,6 +1,21 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@{
+    string homeAction = "Index";
+
+    if (SignInManager.IsSignedIn(User))
+    {
+        if (User.IsInRole("ADMIN"))
+        {
+            homeAction = "AdminHome";
+        }
+        else
+        {
+            homeAction = "Index";
+        }
+    }
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +30,7 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #5a8976;
+            background-color: #bbdccf;
             margin: 0;
             padding: 0;
         }
@@ -24,13 +39,7 @@
             backdrop-filter: blur(5px);
         }
 
-        .navbar-brand,
-        .navbar-nav .nav-link {
-            color: #fff;
-        }
-
         .footer {
-            color: #fff;
             padding: 10px 0;
             text-align: center;
             position: absolute;
@@ -51,7 +60,7 @@
         <header>
             <nav class="navbar navbar-expand-sm navbar-toggleable-sm mb-3">
                 <div class="container">
-                    <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Index">Green Life</a>
+                    <a class="navbar-brand text-dark" asp-area="" asp-controller="Home" asp-action="@homeAction">Green Life</a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                             aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -60,7 +69,7 @@
                         <partial name="_LoginPartial" />
                         <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="@homeAction">Home</a>
                             </li>
                         </ul>
                     </div>
@@ -69,7 +78,7 @@
         </header>
     }
 
-    <div class="container">
+    <div class="container" style="color: #343a40 !important;">
         <main role="main" class="mt-4">
             @RenderBody()
         </main>
@@ -78,7 +87,7 @@
     @if (SignInManager.IsSignedIn(User))
     {
         <footer class="footer">
-            <div class="container text-center">
+            <div class="container text-center text-dark">
                 &copy; @DateTime.Now.Year - Green Life
             </div>
         </footer>

@@ -37,6 +37,11 @@ namespace EnvironmentalSustainabilityApp.Controllers
             return View();
         }
 
+        public IActionResult AdminHome()
+        {
+            return View();
+        }
+
         public IActionResult HomePage()
         {
             return View();
@@ -56,6 +61,18 @@ namespace EnvironmentalSustainabilityApp.Controllers
             return View();
         }
 
+        public async Task<RedirectToActionResult> RedirectToHomeByRole(IdentityUser user)
+        {
+            if (await _userManager.IsInRoleAsync(user, "ADMIN"))
+            {
+                return RedirectToAction("AdminHome", "Home");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login(string userName, string password)
         {
@@ -63,7 +80,8 @@ namespace EnvironmentalSustainabilityApp.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Home");
+                var existingUser = await _userManager.FindByNameAsync(userName);
+                return await RedirectToHomeByRole(existingUser);
             }
             else
             {
@@ -95,7 +113,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
             {
                 await _userManager.AddToRoleAsync(newUser, "REGULARUSER");
                 await _signInManager.SignInAsync(newUser, isPersistent: false);
-                return RedirectToAction("Index", "Home");
+                return await RedirectToHomeByRole(newUser);
             }
             else
             {

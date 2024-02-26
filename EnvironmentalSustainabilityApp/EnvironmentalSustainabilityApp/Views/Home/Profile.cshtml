@@ -9,8 +9,8 @@
         <div class="row">
             <div class="col-md-3">
                 <ul class="nav nav-pills flex-column">
-                    <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "ChangePassword" ? "" : "active")" id="profile" href="#">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link @(ViewContext.RouteData.Values["action"].ToString() == "ChangePassword" ? "active" : "")" id="change-password" href="#">Password</a></li>
+                    <li class="nav-item"><a class="nav-link nav-hover @(ViewContext.RouteData.Values["action"].ToString() == "ChangePassword" ? "" : "active")" id="profile" href="#">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link nav-hover @(ViewContext.RouteData.Values["action"].ToString() == "ChangePassword" ? "active" : "")" id="change-password" href="#">Password</a></li>
                 </ul>
             </div>
             <div class="col-md-9">
@@ -71,33 +71,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const profileLink = document.getElementById('profile');
-            const passwordLink = document.getElementById('change-password');
-            const profileDiv = document.getElementById('profile-div');
-            const passwordDiv = document.getElementById('change-password-div');
-            const profileMsg = document.querySelector('.profile-msg');
-
-            profileLink.addEventListener('click', function (e) {
-                e.preventDefault();
-                profileDiv.style.display = 'block';
-                passwordDiv.style.display = 'none';
-                profileLink.classList.add('active');
-                passwordLink.classList.remove('active');
-                if (profileMsg)
-                    profileMsg.remove();
-            });
-
-            passwordLink.addEventListener('click', function (e) {
-                e.preventDefault();
-                profileDiv.style.display = 'none';
-                passwordDiv.style.display = 'block';
-                profileLink.classList.remove('active');
-                passwordLink.classList.add('active');
-                if (profileMsg)
-                    profileMsg.remove();
-            });
-        });
-    </script>
+    <script src="~/js/profile.js" asp-append-version="true"></script>
 }

@@ -78,19 +78,8 @@ body {
 }
 
 .tab-btn {
-    cursor: pointer;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px 5px 0 0;
-    background-color: #6ab04c;
-    color: #fff;
-    transition: background-color 0.3s;
     width: 100px;
 }
-
-    .tab-btn.active {
-        background-color: #3d8f3d;
-    }
 
 .tab-content {
     padding: 20px;

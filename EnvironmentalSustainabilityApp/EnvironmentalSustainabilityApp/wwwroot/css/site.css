@@ -169,6 +169,10 @@ button {
     transition: background-color 0.3s;
 }
 
-     button.active {
-        background-color: #3d8f3d;
+    button.active {
+        background-color: #3d8f3d !important;
+    }
+
+    button:hover, .nav-hover:hover {
+        background-color: #509150 !important;
     }

@@ -134,28 +134,43 @@ namespace EnvironmentalSustainabilityApp.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateProfile(string username, string newEmail)
         {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            if (user != null)
+            var userName = User.Identity.Name;
+            var currentUser = await _userManager.FindByNameAsync(userName);
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(newEmail);
+            if (existingUserByEmail != null && currentUser != null && existingUserByEmail.Email != currentUser.Email)
             {
-                user.UserName = username;
-                user.Email = newEmail;
+                ModelState.AddModelError("", "Email already exists.");
+            }
 
-                var result = await _userManager.UpdateAsync(user);
+            var existingUserByUserName = await _userManager.FindByNameAsync(username);
+            if (existingUserByUserName != null && currentUser != null && existingUserByUserName.UserName != currentUser.UserName)
+            {
+                ModelState.AddModelError("", "Username already exists.");
+            }
 
-                if (result.Succeeded)
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(User.Identity.Name);
+                if (user != null)
                 {
-                    ViewBag.Username = username;
-                    ViewBag.Email = newEmail;
-                    return View("Profile");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
+                    user.UserName = username;
+                    user.Email = newEmail;
+
+                    var result = await _userManager.UpdateAsync(user);
+
+                    if (!result.Succeeded)
                     {
-                        ModelState.AddModelError("", error.Description);
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
                     }
                 }
             }
+
+            ViewBag.Username = username;
+            ViewBag.Email = newEmail;
 
             return View("Profile");
         }

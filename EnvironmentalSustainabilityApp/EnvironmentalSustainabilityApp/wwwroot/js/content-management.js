@@ -25,7 +25,7 @@ $(document).ready(function () {
             success: function (data) {
                 $('#content-list').empty();
                 $.each(data, function (index, item) {
-                    $('#content-list').append('<li class="nav-item"><a class="nav-link" data-content-id="' + item.contentID + '" href="#">' + item.contentTitle + '</a></li>');
+                    $('#content-list').append('<li class="nav-item"><a class="nav-link nav-hover" data-content-id="' + item.contentID + '" href="#">' + item.contentTitle + '</a></li>');
                 });
             },
             error: function () {

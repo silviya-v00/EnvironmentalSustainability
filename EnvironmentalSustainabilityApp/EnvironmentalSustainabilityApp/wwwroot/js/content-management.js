@@ -48,6 +48,7 @@ $(document).ready(function () {
                 if (data.contentImageFileName) {
                     var imageUrl = '/Home/GetContentImage?fileName=' + encodeURIComponent(data.contentImageFileName);
                     $('#selected-image').attr('src', imageUrl).show();
+                    $('#panel-img').append('<input type="hidden" id="ExistingContentImageFileName" name="ExistingContentImageFileName" value="' + data.contentImageFileName + '">');
                 } else {
                     $('#selected-image').hide();
                 }
@@ -68,8 +69,14 @@ $(document).ready(function () {
         if (activeNavItem.length > 0) {
             contentId = activeNavItem.data('content-id');
         }
-
         formData.append('ContentID', contentId);
+
+        var existingImage = "";
+        var existingImageItem = $('#ExistingContentImageFileName');
+        if (existingImageItem.length > 0) {
+            existingImage = existingImageItem.val();
+        }
+        formData.append('ExistingContentImageFileName', existingImage);
 
         var imageFile = $('#ContentImage')[0].files[0];
         formData.append('ContentImage', imageFile);
@@ -133,5 +140,11 @@ $(document).ready(function () {
             selectedImage.src = '#';
             selectedImage.style.display = 'none';
         }
+    });
+
+    $('#remove-image-icon').click(function () {
+        $('#selected-image').attr('src', '').hide();
+        $('#ContentImage').val('');
+        $('#ExistingContentImageFileName').remove();
     });
 });

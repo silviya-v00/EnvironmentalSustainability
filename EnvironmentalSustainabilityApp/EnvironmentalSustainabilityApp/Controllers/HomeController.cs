@@ -238,7 +238,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
                 }
             }
 
-            _dbUtil.SaveContentToDatabase(content);
+            _dbUtil.SaveContentToDatabase(content, imageFolderPath);
             return Ok();
         }
 

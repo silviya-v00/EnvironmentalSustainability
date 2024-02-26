@@ -91,15 +91,22 @@ namespace EnvironmentalSustainabilityApp.Utils
             return allContent;
         }
 
-        public void SaveContentToDatabase(FeaturedContent content)
+        public void SaveContentToDatabase(FeaturedContent content, string imageFolderPath)
         {
             var sqlConn = new SqlConnection(_connectionString);
             sqlConn.Open();
 
             try
             {
-                string SQL = @"IF ISNULL(@ContentID, '') <> ''
+                string SQL = @"DECLARE @OldContentImageFileName nvarchar(max),
+                                       @NewContentImageFileName nvarchar(max)
+
+                               IF ISNULL(@ContentID, '') <> ''
                                BEGIN
+                                   SET @OldContentImageFileName = (SELECT ContentImageFileName
+																   FROM dbo.FeaturedContent
+																   WHERE ContentID = @ContentID)
+
 	                               UPDATE dbo.FeaturedContent
 	                               SET ContentTitle = @ContentTitle,
 		                               ContentDescription = @ContentDescription,
@@ -107,12 +114,18 @@ namespace EnvironmentalSustainabilityApp.Utils
 		                               ContentImageFileName = @ContentImageFileName,
 		                               IsContentActive = @IsContentActive
 	                               WHERE ContentID = @ContentID
+
+                                   SET @NewContentImageFileName = (SELECT ContentImageFileName 
+																   FROM dbo.FeaturedContent
+																   WHERE ContentID = @ContentID)
                                END
                                ELSE
                                BEGIN
 	                               INSERT INTO dbo.FeaturedContent (ContentTitle, ContentDescription, ContentLink, ContentImageFileName, IsContentActive)
 	                               VALUES (@ContentTitle, @ContentDescription, @ContentLink, @ContentImageFileName, @IsContentActive)
-                               END";
+                               END
+
+							   SELECT @OldContentImageFileName as OldContentImageFileName, @NewContentImageFileName as NewContentImageFileName";
 
                 SqlCommand command = new SqlCommand(SQL, sqlConn);
 
@@ -138,12 +151,25 @@ namespace EnvironmentalSustainabilityApp.Utils
 
                 if (!String.IsNullOrEmpty(content.ContentImageFileName))
                     command.Parameters.Add("@ContentImageFileName", System.Data.SqlDbType.NVarChar).Value = content.ContentImageFileName;
+                else if (!String.IsNullOrEmpty(content.ExistingContentImageFileName))
+                    command.Parameters.Add("@ContentImageFileName", System.Data.SqlDbType.NVarChar).Value = content.ExistingContentImageFileName;
                 else
                     command.Parameters.Add("@ContentImageFileName", System.Data.SqlDbType.NVarChar).Value = DBNull.Value;
 
                 command.Parameters.Add("@IsContentActive", System.Data.SqlDbType.Bit).Value = content.IsContentActive;
 
-                command.ExecuteNonQuery();
+                SqlDataReader dataReader = command.ExecuteReader();
+
+                if (dataReader.Read())
+                {
+                    string oldImageFileName = dataReader["OldContentImageFileName"].ToString();
+                    string newImageFileName = dataReader["NewContentImageFileName"].ToString();
+
+                    if (oldImageFileName != newImageFileName)
+                        DeleteImageFromFolder(oldImageFileName, imageFolderPath);
+                }
+
+                dataReader.Close();
             }
             finally
             {

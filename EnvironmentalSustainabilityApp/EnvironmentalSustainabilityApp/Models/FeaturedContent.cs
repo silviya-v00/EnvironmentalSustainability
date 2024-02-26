@@ -15,6 +15,7 @@ namespace EnvironmentalSustainabilityApp.Models
         public string ContentImageFileName { get; set; }
         public bool IsContentActive { get; set; }
 
+        public string ExistingContentImageFileName { get; set; }
         public IFormFile ContentImage { get; set; }
     }
 }

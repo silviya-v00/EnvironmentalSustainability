@@ -20,6 +20,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
         private DBUtil _dbUtil;
+        private MailUtil _mailUtil;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
 
@@ -31,6 +32,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
             _logger = logger;
             _configuration = configuration;
             _dbUtil = new DBUtil(_configuration.GetConnectionString("DefaultConnection"));
+            _mailUtil = new MailUtil(_configuration);
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -151,7 +153,10 @@ namespace EnvironmentalSustainabilityApp.Controllers
                     var passwordResetLink = Url.Action("ResetPassword", "Home",
                             new { email = model.Email, token = token }, Request.Scheme);
 
-                    _logger.Log(LogLevel.Warning, passwordResetLink);
+                    var subject = "Password Reset";
+                    var messageBody = "To reset your password, please click the following link: <a href='" + passwordResetLink + "'>Reset Password</a>";
+
+                    _mailUtil.SendEmail(model.Email, subject, messageBody);
 
                     return View("ForgotPasswordConfirmation");
                 }

@@ -1,9 +1,11 @@
 ﻿$(document).ready(function () {
     let states = [];
     let cities = [];
+    let isSearchBarsDisabled = false;
 
     // Needed to prevent too many requests
-    const disableSearchBars = (duration) => {
+    const disableSearchBars = (duration, type) => {
+        isSearchBarsDisabled = true;
         $('#searchInputCountry').prop('disabled', true);
         $('#searchInputState').prop('disabled', true);
         $('#searchInputCity').prop('disabled', true);
@@ -13,8 +15,35 @@
             $('#searchInputCountry').prop('disabled', false);
             $('#searchInputState').prop('disabled', false);
             $('#searchInputCity').prop('disabled', false);
+            isSearchBarsDisabled = false;
+            updateCityDetailsVisibility(type)
         }, duration);
     };
+
+    const updateCityDetailsVisibility = (type) => {
+        if (type === 'city') {
+            if (isSearchBarsDisabled) {
+                $('#msgNoData').css('display', '');
+                $('#air-and-weather-container').css('display', 'none');
+            } else {
+                $('#msgNoData').css('display', 'none');
+                $('#air-and-weather-container').css('display', '');
+            }
+        }
+    };
+
+    $(document.body).on('click', '.searchInput', function (event) {
+        event.stopPropagation();
+
+        $(this).trigger('input');
+        $('.search-results').css('display', 'none');
+        const resultsId = `#searchResults${$(this).attr('id').replace('searchInput', '')}`;
+        $(resultsId).css('display', 'block');
+    });
+
+    $(document.body).on('click', function () {
+        $('.search-results').css('display', 'none');
+    });
 
     const fetchCountries = () => {
         $.get(`${apiUrlAirVisual}/countries?key=${apiKeyAirVisual}`, function (data) {
@@ -84,23 +113,17 @@
                 $('#searchInputCity').val('');
                 $('#msgNoData').css('display', 'block');
                 $('#air-and-weather-container').css('display', 'none');
-                disableSearchBars(10000);
+                disableSearchBars(10000, type);
                 fetchStates(name);
             } else if (type === 'state') {
                 $('#searchInputCity').val('');
                 $('#msgNoData').css('display', 'block');
                 $('#air-and-weather-container').css('display', 'none');
-                disableSearchBars(10000);
+                disableSearchBars(10000, type);
                 fetchCities($('#searchInputCountry').val(), name);
-            }
-
-            if (type === 'city') {
-                disableSearchBars(10000);
-                $('#msgNoData').css('display', 'none');
-                $('#air-and-weather-container').css('display', '');
-
-                const aqi = 2300;
-                updateAQICard(aqi);
+            } else if (type === 'city') {
+                disableSearchBars(10000, type);
+                fetchCityData(name, $('#searchInputState').val(), $('#searchInputCountry').val());
             }
         }
 
@@ -122,6 +145,29 @@
                     cities = citiesData.map((city, index) => ({ id: index + 1, name: city.city }));
                 } else {
                     console.error("Failed to fetch cities.");
+                }
+            });
+        };
+
+        const fetchCityData = (city, state, country) => {
+            $.get(`${apiUrlAirVisual}/city?city=${city}&state=${state}&country=${country}&key=${apiKeyAirVisual}`, function (data) {
+                if (data.status === "success") {
+                    const { pollution, weather } = data.data.current;
+                    const aqi = pollution && pollution.aqius ? pollution.aqius : null;
+
+                    if (aqi !== null) {
+                        const { tp, hu, ws, pr } = weather;
+                        updateAQICard(aqi);
+                        $('#wTemperature').text(`${tp}°C`);
+                        $('#wHumidity').text(`${hu}%`);
+                        $('#wWind').text(`${(ws * 3.6).toFixed(2)} km/h`);
+                        $('#wPressure').text(`${pr} mbar`);
+                    } else {
+                        $('#msgNoData').css('display', '');
+                        $('#air-and-weather-container').css('display', 'none');
+                    }
+                } else {
+                    console.error("Failed to fetch city data.");
                 }
             });
         };

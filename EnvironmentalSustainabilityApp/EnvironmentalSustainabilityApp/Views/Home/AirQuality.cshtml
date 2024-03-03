@@ -12,24 +12,24 @@
     <div class="card-container">
         <div class="search-row">
             <div class="centered-container">
-                <input type="text" class="searchInput" id="searchInputCountry" placeholder="Search countries by name">
+                <input type="text" class="searchInput" id="searchInputCountry" placeholder="Search countries by name" autocomplete="off">
                 <div id="searchResultsCountry" class="search-results centered-container result-row"></div>
             </div>
         </div>
         <div class="search-row">
             <div class="centered-container">
-                <input type="text" class="searchInput" id="searchInputState" placeholder="Search states by name">
+                <input type="text" class="searchInput" id="searchInputState" placeholder="Search states by name" autocomplete="off">
                 <div id="searchResultsState" class="search-results centered-container result-row"></div>
             </div>
         </div>
         <div class="search-row">
             <div class="centered-container">
-                <input type="text" class="searchInput" id="searchInputCity" placeholder="Search cities by name">
+                <input type="text" class="searchInput" id="searchInputCity" placeholder="Search cities by name" autocomplete="off">
                 <div id="searchResultsCity" class="search-results centered-container result-row"></div>
             </div>
         </div>
     </div>
-    <div id="searchingData" style="text-align: center; display: none;">Searching...</div>
+    <div id="searchingData" style="text-align: center; margin-top: 10px; display: none;">Searching...</div>
 
     <div style="margin-top: 30px;">
         <div id="msgNoData" style="text-align: center;">No data available</div>
@@ -45,20 +45,20 @@
                 <div class="card">
                     <h4 class="card-header">Weather</h4>
                     <div class="weather-item">
-                        <span class="weather-label">Temperature:</span>
-                        <span class="weather-value" id="wTemperature">12°C</span>
+                        <span class="weather-label">Temperature</span>
+                        <span class="weather-value" id="wTemperature"></span>
                     </div>
                     <div class="weather-item">
-                        <span class="weather-label">Humidity:</span>
-                        <span class="weather-value" id="wHumidity">62%</span>
+                        <span class="weather-label">Humidity</span>
+                        <span class="weather-value" id="wHumidity"></span>
                     </div>
                     <div class="weather-item">
-                        <span class="weather-label">Wind:</span>
-                        <span class="weather-value" id="wWind">3.7 km/h</span>
+                        <span class="weather-label">Wind</span>
+                        <span class="weather-value" id="wWind"></span>
                     </div>
                     <div class="weather-item">
-                        <span class="weather-label">Pressure:</span>
-                        <span class="weather-value" id="wPressure">1013 mbar</span>
+                        <span class="weather-label">Pressure</span>
+                        <span class="weather-value" id="wPressure"></span>
                     </div>
                 </div>
             </div>

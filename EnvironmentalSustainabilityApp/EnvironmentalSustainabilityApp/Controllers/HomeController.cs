@@ -64,6 +64,11 @@ namespace EnvironmentalSustainabilityApp.Controllers
             return View();
         }
 
+        public IActionResult AirQuality()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> Profile()
         {
             var userName = User.Identity.Name;

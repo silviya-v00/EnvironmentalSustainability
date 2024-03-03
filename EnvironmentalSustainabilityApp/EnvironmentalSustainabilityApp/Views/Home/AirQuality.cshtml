@@ -1,0 +1,103 @@
+﻿@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    ViewData["Title"] = "Air Quality";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/air-quality.css" />
+}
+
+<div style="padding: 20px;">
+    <h2 style="text-align: center;">Select location:</h2>
+    <div class="card-container">
+        <div class="search-row">
+            <div class="centered-container">
+                <input type="text" class="searchInput" id="searchInputCountry" placeholder="Search countries by name">
+                <div id="searchResultsCountry" class="search-results centered-container result-row"></div>
+            </div>
+        </div>
+        <div class="search-row">
+            <div class="centered-container">
+                <input type="text" class="searchInput" id="searchInputState" placeholder="Search states by name">
+                <div id="searchResultsState" class="search-results centered-container result-row"></div>
+            </div>
+        </div>
+        <div class="search-row">
+            <div class="centered-container">
+                <input type="text" class="searchInput" id="searchInputCity" placeholder="Search cities by name">
+                <div id="searchResultsCity" class="search-results centered-container result-row"></div>
+            </div>
+        </div>
+    </div>
+    <div id="searchingData" style="text-align: center; display: none;">Searching...</div>
+
+    <div style="margin-top: 30px;">
+        <div id="msgNoData" style="text-align: center;">No data available</div>
+        <div id="air-and-weather-container" style="display: none;">
+            <div class="card-container">
+                <div class="card">
+                    <h4 class="card-header">Air Quality</h4>
+                    <div class="aqDetails">
+                        <div id="aqIndex" style="font-size: 36px; text-align: center;"></div>
+                        <div id="aqType" style="text-align: center;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4 class="card-header">Weather</h4>
+                    <div class="weather-item">
+                        <span class="weather-label">Temperature:</span>
+                        <span class="weather-value" id="wTemperature">12°C</span>
+                    </div>
+                    <div class="weather-item">
+                        <span class="weather-label">Humidity:</span>
+                        <span class="weather-value" id="wHumidity">62%</span>
+                    </div>
+                    <div class="weather-item">
+                        <span class="weather-label">Wind:</span>
+                        <span class="weather-value" id="wWind">3.7 km/h</span>
+                    </div>
+                    <div class="weather-item">
+                        <span class="weather-label">Pressure:</span>
+                        <span class="weather-value" id="wPressure">1013 mbar</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <h4>Legend</h4>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00e400;"></div>
+                    <div><strong>Good:</strong> Air quality is satisfactory.</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffff00;"></div>
+                    <div><strong>Moderate:</strong> Air quality is acceptable.</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff7e00;"></div>
+                    <div><strong>Unhealthy for Sensitive Groups:</strong> People with respiratory or heart conditions should limit outdoor exertion.</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff0000;"></div>
+                    <div><strong>Unhealthy:</strong> Everyone may begin to experience health effects.</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #8f3f97;"></div>
+                    <div><strong>Very Unhealthy:</strong> Health warnings of emergency conditions.</div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #7e0023;"></div>
+                    <div><strong>Hazardous:</strong> Health alert: everyone should avoid outdoor activities.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const apiUrlAirVisual = '@Configuration.GetSection("ApiSettings")["AirVisualApiUrl"]';
+        const apiKeyAirVisual = '@Configuration.GetSection("ApiSettings")["AirVisualApiKey"]';
+    </script>
+    <script src="~/js/air-quality.js" asp-append-version="true"></script>
+}

@@ -53,6 +53,7 @@
             margin-top: 20px;
         }
     </style>
+    @RenderSection("Styles", required: false)
 </head>
 <body>
     @if (SignInManager.IsSignedIn(User))
@@ -71,6 +72,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="@homeAction">Home</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AirQuality">Air Quality</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -78,7 +82,7 @@
         </header>
     }
 
-    <div class="container" style="color: #343a40 !important;">
+    <div class="container" style="color: #343a40 !important; padding-bottom: 80px;">
         <main role="main" class="mt-4">
             @RenderBody()
         </main>

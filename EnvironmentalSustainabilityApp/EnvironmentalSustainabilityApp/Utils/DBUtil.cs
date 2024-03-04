@@ -53,7 +53,7 @@ namespace EnvironmentalSustainabilityApp.Utils
             return contentData;
         }
 
-        public List<FeaturedContent> GetContentListFromDatabase()
+        public List<FeaturedContent> GetContentListFromDatabase(string contentType)
         {
             List<FeaturedContent> allContent = new List<FeaturedContent>();
             var sqlConn = new SqlConnection(_connectionString);
@@ -63,9 +63,11 @@ namespace EnvironmentalSustainabilityApp.Utils
             {
                 string SQL = @"SELECT ContentID, ContentTitle, ContentDescription, ContentLink, ContentImageFileName, IsContentActive
                                FROM dbo.FeaturedContent
+                               WHERE @ContentType = 'ALL' OR (@ContentType = 'ACTIVE' AND IsContentActive = 1) OR (@ContentType = 'INACTIVE' AND IsContentActive = 0)
                                ORDER BY ContentTitle";
 
                 SqlCommand command = new SqlCommand(SQL, sqlConn);
+                command.Parameters.Add("@ContentType", System.Data.SqlDbType.NVarChar).Value = contentType;
                 SqlDataReader dataReader = command.ExecuteReader();
 
                 while (dataReader.Read())

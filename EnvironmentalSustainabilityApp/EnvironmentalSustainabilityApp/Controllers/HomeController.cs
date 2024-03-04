@@ -39,7 +39,8 @@ namespace EnvironmentalSustainabilityApp.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var featuredContent = _dbUtil.GetContentListFromDatabase("ACTIVE");
+            return View(featuredContent);
         }
 
         public IActionResult LoginPage()
@@ -292,7 +293,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
         [HttpGet]
         public IActionResult GetContentList()
         {
-            var contentList = _dbUtil.GetContentListFromDatabase();
+            var contentList = _dbUtil.GetContentListFromDatabase("ALL");
 
             return Json(contentList);
         }

@@ -31,13 +31,14 @@ namespace EnvironmentalSustainabilityApp.Utils
 
                                 DECLARE @CategoriesNotCompleted TABLE (
                                     CarbonFootprintCategoryID int,
+                                    CarbonFootprintCategoryKey nvarchar(max),
                                     CarbonFootprintCategoryName nvarchar(max)
                                 )
 
                                 IF @AllCategoriesCompleted = 0
                                 BEGIN
-                                    INSERT INTO @CategoriesNotCompleted (CarbonFootprintCategoryID, CarbonFootprintCategoryName)
-                                    SELECT c.CarbonFootprintCategoryID, c.CarbonFootprintCategoryName
+                                    INSERT INTO @CategoriesNotCompleted (CarbonFootprintCategoryID, CarbonFootprintCategoryKey, CarbonFootprintCategoryName)
+                                    SELECT c.CarbonFootprintCategoryID, c.CarbonFootprintCategoryKey, c.CarbonFootprintCategoryName
                                     FROM dbo.CarbonFootprintCategories c
                                     LEFT OUTER JOIN dbo.CarbonFootprintUser u ON c.CarbonFootprintCategoryID = u.CarbonFootprintCategoryID
                                     WHERE u.CarbonFootprintID IS NULL
@@ -47,6 +48,7 @@ namespace EnvironmentalSustainabilityApp.Utils
                                     @CompletedCategoryCount as CompletedCategoryCount,
 	                                @TotalCategoryCount as TotalCategoryCount,
                                     a.CarbonFootprintCategoryID,
+                                    a.CarbonFootprintCategoryKey,
                                     a.CarbonFootprintCategoryName,
 	                                b.CarbonFootprintResult
                                 FROM @CategoriesNotCompleted a
@@ -69,6 +71,7 @@ namespace EnvironmentalSustainabilityApp.Utils
                     if (dataReader["CarbonFootprintCategoryID"] is int)
                         testResult.CarbonFootprintCategoryID = (int)dataReader["CarbonFootprintCategoryID"];
 
+                    testResult.CarbonFootprintCategoryKey = dataReader["CarbonFootprintCategoryKey"].ToString();
                     testResult.CarbonFootprintCategoryName = dataReader["CarbonFootprintCategoryName"].ToString();
 
                     if (dataReader["CarbonFootprintResult"] is decimal)

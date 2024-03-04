@@ -26,6 +26,7 @@ namespace EnvironmentalSustainabilityApp.Models
         public int? CompletedCategoryCount { get; set; }
         public int? TotalCategoryCount { get; set; }
         public int? CarbonFootprintCategoryID { get; set; }
+        public string CarbonFootprintCategoryKey { get; set; }
         public string CarbonFootprintCategoryName { get; set; }
         public decimal? CarbonFootprintResult { get; set; }
     }

@@ -48,7 +48,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
             bool allCategoriesCompleted = false;
             bool noneCategoriesCompleted = false;
             bool someCategoriesCompleted = false;
-            List<string> categoriesNotCompleted = new List<string>();
+            List<(string CategoryName, string PageName)> categoriesNotCompleted = new List<(string, string)>();
 
             var currentUser = await GetApplicationUser();
             var carbonFootprintResult = _dbUtil.GetCarbonFootprintResult(currentUser.Id);
@@ -70,7 +70,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
                     if (firstResult.CompletedCategoryCount < firstResult.TotalCategoryCount)
                     {
                         someCategoriesCompleted = true;
-                        categoriesNotCompleted = carbonFootprintResult.Select(x => x.CarbonFootprintCategoryName).ToList(); ;
+                        categoriesNotCompleted = carbonFootprintResult.Select(x => (x.CarbonFootprintCategoryName, CommonUtil.GetPageName(x.CarbonFootprintCategoryKey))).ToList(); ;
                     }
                 }
             }

@@ -1,0 +1,59 @@
+USE [EnvironmentalSustainability]
+GO
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
+               WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'CarbonFootprintCategories')
+BEGIN
+	CREATE TABLE dbo.CarbonFootprintCategories (
+		CarbonFootprintCategoryID int IDENTITY(1,1) PRIMARY KEY,
+		CarbonFootprintCategoryKey nvarchar(max),
+		CarbonFootprintCategoryName nvarchar(max)
+	)
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES 
+               WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'CarbonFootprintUser')
+BEGIN
+	CREATE TABLE dbo.CarbonFootprintUser (
+		CarbonFootprintID int IDENTITY(1,1) PRIMARY KEY,
+		UserID nvarchar(450),
+		CarbonFootprintCategoryID int,
+		CarbonFootprintResult decimal(27,11)
+		CONSTRAINT FK_CarbonFootprintUser_AspNetUsers_UserID FOREIGN KEY (UserID) REFERENCES dbo.AspNetUsers(Id),
+		CONSTRAINT FK_CarbonFootprintUser_CarbonFootprintCategories_CarbonFootprintCategoryID FOREIGN KEY (CarbonFootprintCategoryID) REFERENCES dbo.CarbonFootprintCategories(CarbonFootprintCategoryID)
+	)
+END
+GO
+
+IF NOT EXISTS (SELECT NULL FROM dbo.CarbonFootprintCategories
+			   WHERE CarbonFootprintCategoryKey = 'ENERGY_USAGE')
+BEGIN
+	INSERT INTO dbo.CarbonFootprintCategories (CarbonFootprintCategoryKey, CarbonFootprintCategoryName)
+	VALUES ('ENERGY_USAGE', 'Energy Usage')
+END
+GO
+
+IF NOT EXISTS (SELECT NULL FROM dbo.CarbonFootprintCategories
+			   WHERE CarbonFootprintCategoryKey = 'TRANSPORTATION')
+BEGIN
+	INSERT INTO dbo.CarbonFootprintCategories (CarbonFootprintCategoryKey, CarbonFootprintCategoryName)
+	VALUES ('TRANSPORTATION', 'Transportation')
+END
+GO
+
+IF NOT EXISTS (SELECT NULL FROM dbo.CarbonFootprintCategories
+			   WHERE CarbonFootprintCategoryKey = 'FOOD_AND_DIET')
+BEGIN
+	INSERT INTO dbo.CarbonFootprintCategories (CarbonFootprintCategoryKey, CarbonFootprintCategoryName)
+	VALUES ('FOOD_AND_DIET', 'Food and Diet')
+END
+GO
+
+IF NOT EXISTS (SELECT NULL FROM dbo.CarbonFootprintCategories
+			   WHERE CarbonFootprintCategoryKey = 'WASTE_MANAGEMENT')
+BEGIN
+	INSERT INTO dbo.CarbonFootprintCategories (CarbonFootprintCategoryKey, CarbonFootprintCategoryName)
+	VALUES ('WASTE_MANAGEMENT', 'Waste Management')
+END
+GO

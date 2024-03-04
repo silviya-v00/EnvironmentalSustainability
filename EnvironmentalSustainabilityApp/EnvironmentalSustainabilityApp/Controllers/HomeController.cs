@@ -37,9 +37,48 @@ namespace EnvironmentalSustainabilityApp.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IdentityUser> GetApplicationUser()
+        {
+            return await _userManager.GetUserAsync(User);
+        }
+
+        public async Task<IActionResult> Index()
         {
             var featuredContent = _dbUtil.GetContentListFromDatabase("ACTIVE");
+            bool allCategoriesCompleted = false;
+            bool noneCategoriesCompleted = false;
+            bool someCategoriesCompleted = false;
+            List<string> categoriesNotCompleted = new List<string>();
+
+            var currentUser = await GetApplicationUser();
+            var carbonFootprintResult = _dbUtil.GetCarbonFootprintResult(currentUser.Id);
+
+            if (carbonFootprintResult.Count == 0)
+            {
+                allCategoriesCompleted = true;
+            }
+            else
+            {
+                var firstResult = carbonFootprintResult.FirstOrDefault();
+
+                if (firstResult.CompletedCategoryCount == 0)
+                {
+                    noneCategoriesCompleted = true;
+                }
+                else
+                {
+                    if (firstResult.CompletedCategoryCount < firstResult.TotalCategoryCount)
+                    {
+                        someCategoriesCompleted = true;
+                        categoriesNotCompleted = carbonFootprintResult.Select(x => x.CarbonFootprintCategoryName).ToList(); ;
+                    }
+                }
+            }
+
+            ViewBag.AllCategoriesCompleted = allCategoriesCompleted;
+            ViewBag.NoneCategoriesCompleted = noneCategoriesCompleted;
+            ViewBag.SomeCategoriesCompleted = someCategoriesCompleted;
+            ViewBag.CategoriesNotCompleted = categoriesNotCompleted;
             return View(featuredContent);
         }
 

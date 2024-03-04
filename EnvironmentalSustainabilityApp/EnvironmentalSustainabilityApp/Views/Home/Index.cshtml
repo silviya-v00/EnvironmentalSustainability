@@ -31,10 +31,53 @@
 <div style="background-color: #bbdccf;">
     <div class="text-center">
         <h1 class="display-4">Welcome</h1>
-        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
     </div>
 
-    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+    @if (ViewBag.AllCategoriesCompleted)
+    {
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h3>Your Carbon Footprint Test Results</h3>
+                    <p>You haven completed the carbon footprint test</p>
+                    <a href="@Url.Action("Profile", "Home")" class="btn btn-system">Retake Test</a>
+                </div>
+            </div>
+        </div>
+    }
+    else if (ViewBag.NoneCategoriesCompleted)
+    {
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h3>Start Your Carbon Footprint Test</h3>
+                    <p>You haven't completed the carbon footprint test yet</p>
+                    <a href="@Url.Action("Profile", "Home")" class="btn btn-system">Start Test</a>
+                </div>
+            </div>
+        </div>
+    }
+    else if (ViewBag.SomeCategoriesCompleted)
+    {
+        <div class="container mt-4">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <h3>Complete Your Carbon Footprint Test</h3>
+                    <p>You haven't completed the carbon footprint test for the following categories:</p>
+                    <div class="row">
+                        @foreach (var category in ViewBag.CategoriesNotCompleted)
+                        {
+                            <div class="col">
+                                <a href="@Url.Action("Profile", "Home")" class="btn btn-system">@category</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" style="margin-top: 50px;">
         <ol class="carousel-indicators" style="bottom: -30px;">
             @for (int i = 0; i < Math.Ceiling((double)Model.Count() / 3); i++)
             {

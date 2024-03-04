@@ -16,6 +16,77 @@ namespace EnvironmentalSustainabilityApp.Utils
             _connectionString = connectionString;
         }
 
+        public List<CarbonFootprintTestResult> GetCarbonFootprintResult(string userID)
+        {
+            List<CarbonFootprintTestResult> carbonFootprints = new List<CarbonFootprintTestResult>();
+            var sqlConn = new SqlConnection(_connectionString);
+            sqlConn.Open();
+
+            try
+            {
+                string SQL = @"
+                                DECLARE @TotalCategoryCount int = (SELECT COUNT(*) FROM dbo.CarbonFootprintCategories)
+                                DECLARE @CompletedCategoryCount int = (SELECT COUNT(*) FROM dbo.CarbonFootprintUser WHERE UserID = @UserID)
+                                DECLARE @AllCategoriesCompleted bit = CASE WHEN @CompletedCategoryCount = @TotalCategoryCount THEN 1 ELSE 0 END
+
+                                DECLARE @CategoriesNotCompleted TABLE (
+                                    CarbonFootprintCategoryID int,
+                                    CarbonFootprintCategoryName nvarchar(max)
+                                )
+
+                                IF @AllCategoriesCompleted = 0
+                                BEGIN
+                                    INSERT INTO @CategoriesNotCompleted (CarbonFootprintCategoryID, CarbonFootprintCategoryName)
+                                    SELECT c.CarbonFootprintCategoryID, c.CarbonFootprintCategoryName
+                                    FROM dbo.CarbonFootprintCategories c
+                                    LEFT OUTER JOIN dbo.CarbonFootprintUser u ON c.CarbonFootprintCategoryID = u.CarbonFootprintCategoryID
+                                    WHERE u.CarbonFootprintID IS NULL
+                                END
+
+                                SELECT
+                                    @CompletedCategoryCount as CompletedCategoryCount,
+	                                @TotalCategoryCount as TotalCategoryCount,
+                                    a.CarbonFootprintCategoryID,
+                                    a.CarbonFootprintCategoryName,
+	                                b.CarbonFootprintResult
+                                FROM @CategoriesNotCompleted a
+                                LEFT OUTER JOIN dbo.CarbonFootprintUser b on a.CarbonFootprintCategoryID = b.CarbonFootprintCategoryID and b.UserID = @UserID";
+
+                SqlCommand command = new SqlCommand(SQL, sqlConn);
+                command.Parameters.Add("@UserID", System.Data.SqlDbType.NVarChar).Value = userID;
+                SqlDataReader dataReader = command.ExecuteReader();
+
+                while (dataReader.Read())
+                {
+                    CarbonFootprintTestResult testResult = new CarbonFootprintTestResult();
+
+                    if (dataReader["CompletedCategoryCount"] is int)
+                        testResult.CompletedCategoryCount = (int)dataReader["CompletedCategoryCount"];
+
+                    if (dataReader["TotalCategoryCount"] is int)
+                        testResult.TotalCategoryCount = (int)dataReader["TotalCategoryCount"];
+
+                    if (dataReader["CarbonFootprintCategoryID"] is int)
+                        testResult.CarbonFootprintCategoryID = (int)dataReader["CarbonFootprintCategoryID"];
+
+                    testResult.CarbonFootprintCategoryName = dataReader["CarbonFootprintCategoryName"].ToString();
+
+                    if (dataReader["CarbonFootprintResult"] is decimal)
+                        testResult.CarbonFootprintResult = (decimal)dataReader["CarbonFootprintResult"];
+
+                    carbonFootprints.Add(testResult);
+                }
+
+                dataReader.Close();
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+
+            return carbonFootprints;
+        }
+
         public FeaturedContent GetContentDetailsFromDatabase(int contentID)
         {
             FeaturedContent contentData = new FeaturedContent();

@@ -75,7 +75,7 @@ namespace EnvironmentalSustainabilityApp.Utils
                     testResult.CarbonFootprintCategoryName = dataReader["CarbonFootprintCategoryName"].ToString();
 
                     if (dataReader["CarbonFootprintResult"] is decimal)
-                        testResult.CarbonFootprintResult = (decimal)dataReader["CarbonFootprintResult"];
+                        testResult.CarbonFootprintResult = (decimal)dataReader["CarbonFootprintResult"] / 1000; // convert from kg to tons
 
                     carbonFootprints.Add(testResult);
                 }
@@ -88,6 +88,69 @@ namespace EnvironmentalSustainabilityApp.Utils
             }
 
             return carbonFootprints;
+        }
+
+        public decimal? GetCarbonFootprintByCategory(string userID, string categoryKey)
+        {
+            decimal? carbonFootprintResult = null;
+            var sqlConn = new SqlConnection(_connectionString);
+            sqlConn.Open();
+
+            try
+            {
+                string SQL = @"
+                                SELECT a.CarbonFootprintResult
+                                FROM dbo.CarbonFootprintUser a
+                                INNER JOIN dbo.CarbonFootprintCategories b ON a.CarbonFootprintCategoryID = b.CarbonFootprintCategoryID
+                                WHERE a.UserID = @UserID AND b.CarbonFootprintCategoryKey = @CategoryKey";
+
+                SqlCommand command = new SqlCommand(SQL, sqlConn);
+                command.Parameters.Add("@UserID", System.Data.SqlDbType.NVarChar).Value = userID;
+                command.Parameters.Add("@CategoryKey", System.Data.SqlDbType.NVarChar).Value = categoryKey;
+                SqlDataReader dataReader = command.ExecuteReader();
+
+                if (dataReader.Read())
+                {
+                    if (dataReader["CarbonFootprintResult"] is decimal)
+                        carbonFootprintResult = Math.Round((decimal)dataReader["CarbonFootprintResult"] / 1000, 3); // convert from kg to tons
+                }
+
+                dataReader.Close();
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+
+            return carbonFootprintResult;
+        }
+
+        public void SaveCarbonFootprintByCategory(string userID, string categoryKey, decimal carbonFootprintResult)
+        {
+            var sqlConn = new SqlConnection(_connectionString);
+            sqlConn.Open();
+
+            try
+            {
+                string SQL = @"
+								DECLARE @CategoryID int = (SELECT CarbonFootprintCategoryID FROM dbo.CarbonFootprintCategories WHERE CarbonFootprintCategoryKey = @CategoryKey)
+								
+								DELETE FROM dbo.CarbonFootprintUser
+								WHERE UserID = @UserID AND CarbonFootprintCategoryID = @CategoryID
+
+								INSERT INTO dbo.CarbonFootprintUser (UserID, CarbonFootprintCategoryID, CarbonFootprintResult)
+								VALUES (@UserID, @CategoryID, @CarbonFootprintResult)";
+
+                SqlCommand command = new SqlCommand(SQL, sqlConn);
+                command.Parameters.Add("@UserID", System.Data.SqlDbType.NVarChar).Value = userID;
+                command.Parameters.Add("@CategoryKey", System.Data.SqlDbType.NVarChar).Value = categoryKey;
+                command.Parameters.Add("@CarbonFootprintResult", System.Data.SqlDbType.Decimal).Value = carbonFootprintResult;
+                command.ExecuteNonQuery();
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
         }
 
         public FeaturedContent GetContentDetailsFromDatabase(int contentID)

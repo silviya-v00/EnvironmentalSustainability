@@ -1,3 +1,92 @@
-﻿@{
+﻿@model TransportationViewModel
+
+@{
     ViewData["Title"] = "Transportation";
+    string nextAction = "FoodAndDiet";
+    string nextController = "CarbonFootprint";
+}
+
+@section Styles {
+    <style>
+        .transportation-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+}
+
+<div class="container mt-4" style="padding: 20px 60px;">
+    <div class="row">
+        <div class="col-md-4" style="text-align: center;">
+            <div id="carbon-emissions-result" class="result-section">
+                <h4 class="mt-4">Carbon Footprint:</h4>
+                <p>Based on your answers, your estimated transportation carbon footprint is <strong>@ViewBag.CarbonFootprintResult tonnes of CO2 per year</strong>.</p>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="transportation-container">
+                <h2 class="mb-4" style="text-align: center;">Transportation</h2>
+                <form id="transportation-form" asp-action="CalculateTransportationFootprint" method="post">
+                    <div class="form-group">
+                        <label for="KilometersDriven">How many kilometers do you drive per week?</label>
+                        <input type="number" id="KilometersDriven" name="KilometersDriven" class="form-control" min="0" step="1" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="FuelType">What type of fuel do you primarily use?</label>
+                        <select id="FuelType" name="FuelType" class="form-control" required>
+                            <option value="Petrol">Petrol</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Hybrid">Hybrid</option>
+                            <option value="Electric">Electric</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="NumberOfVehicles">How many vehicles does your household own?</label>
+                        <input type="number" id="NumberOfVehicles" name="NumberOfVehicles" class="form-control" min="0" step="1" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="UsesPublicTransport">Do you use public transport?</label>
+                        <select id="UsesPublicTransport" name="UsesPublicTransport" class="form-control" required>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="FlightsTaken">How many flights do you take per year?</label>
+                        <input type="number" id="FlightsTaken" name="FlightsTaken" class="form-control" min="0" step="1" required />
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn">@((bool)ViewBag.HasCarbonFootprintResult ? "Re-Calculate" : "Calculate")</button>
+                        <a href="@Url.Action(nextAction, nextController)" class="btn btn-secondary">Continue</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#transportation-form').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'post',
+                data: $(this).serialize(),
+                success: function () {
+                    window.location.href = '@Url.Action(nextAction, nextController)';
+                }
+            });
+        });
+    </script>
 }

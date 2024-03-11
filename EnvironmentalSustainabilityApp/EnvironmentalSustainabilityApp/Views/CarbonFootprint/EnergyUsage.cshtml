@@ -38,7 +38,7 @@
                 <form id="energy-usage-form" asp-action="CalculateEnergyFootprint" method="post">
                     <div class="form-group">
                         <label for="ElectricityConsumption">How many kilowatt-hours (kWh) of electricity does your household consume per month?</label>
-                        <input type="number" id="ElectricityConsumption" name="ElectricityConsumption" class="form-control" min="0" required />
+                        <input type="number" id="ElectricityConsumption" name="ElectricityConsumption" class="form-control" min="0" step="1" required />
                     </div>
                     <div class="form-group">
                         <label for="HeatingType">What type of heating system do you use in your home?</label>
@@ -53,7 +53,7 @@
                     </div>
                     <div class="form-group">
                         <label for="ApplianceUsage">How many hours per day, on average, do you use major energy-consuming appliances (e.g., washing machines, dryers, dishwashers)?</label>
-                        <input type="number" id="ApplianceUsage" name="ApplianceUsage" class="form-control" min="0" required />
+                        <input type="number" id="ApplianceUsage" name="ApplianceUsage" class="form-control" min="0" step="1" required />
                     </div>
                     <div class="form-group">
                         <label for="RenewableEnergy">Do you use renewable energy sources (e.g., solar panels) in your home?</label>
@@ -64,7 +64,7 @@
                     </div>
                     <div class="form-group">
                         <label for="NumberOfPeople">How many people live in your household?</label>
-                        <input type="number" id="NumberOfPeople" name="NumberOfPeople" class="form-control" min="1" value="1" required />
+                        <input type="number" id="NumberOfPeople" name="NumberOfPeople" class="form-control" min="1" value="1" step="1" required />
                     </div>
                     <div style="text-align: center;">
                         <button type="submit" class="btn">@((bool)ViewBag.HasCarbonFootprintResult ? "Re-Calculate" : "Calculate")</button>

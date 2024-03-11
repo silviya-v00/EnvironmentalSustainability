@@ -58,24 +58,18 @@ namespace EnvironmentalSustainabilityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Constants for carbon emissions factors (in kg CO2 per unit)
-                const double ElectricityEmissionsFactor = 0.4;
-                const double GasEmissionsFactor = 0.184;
-                const double OilEmissionsFactor = 0.278;
-                const double WoodPelletEmissionsFactor = 0.01;
-                const double HeatPumpEmissionsFactor = 0.05;
+                // in kg CO2 per unit
+                const double ElectricityEmissionsFactor = 0.309;
+                const double GasEmissionsFactor = 0.21;
+                const double OilEmissionsFactor = 0.28;
+                const double WoodPelletEmissionsFactor = 0.04;
+                const double HeatPumpEmissionsFactor = 0.59;
                 const double SolarEmissionsFactor = 0;
-                const double ElectricHeatingEmissionsFactor = 0.4;
-
-                // Constants for appliance emissions factors (in kg CO2 per hour)
-                const double ApplianceEmissionsFactor = 0.1;
-
-                // Constants for renewable energy usage
+                const double ElectricHeatingEmissionsFactor = 0.59;
+                const double ApplianceEmissionsFactor = 0.1; // in kg CO2 per hour
                 const double RenewableEnergyReductionFactor = 0.2; // 20% reduction in emissions
-
-                // Constants for time periods
-                const double MonthsInYear = 12;
-                const double HoursInYear = 24 * 365;
+                const int MonthsInYear = 12;
+                const int DaysInYear = 365;
 
                 double electricityConsumptionPerMonth = model.ElectricityConsumption;
                 string heatingType = model.HeatingType;
@@ -83,37 +77,36 @@ namespace EnvironmentalSustainabilityApp.Controllers
                 string renewableEnergy = model.RenewableEnergy;
                 int numberOfPeople = model.NumberOfPeople;
 
-                // electricity
                 double electricityEmissionsPerYear = electricityConsumptionPerMonth * MonthsInYear * ElectricityEmissionsFactor;
 
-                // heating
+                double heatingFactor = 0;
                 double heatingEmissionsPerYear = 0;
                 switch (heatingType)
                 {
                     case "Gas":
-                        heatingEmissionsPerYear = electricityConsumptionPerMonth * MonthsInYear * GasEmissionsFactor;
+                        heatingFactor = GasEmissionsFactor;
                         break;
                     case "Oil":
-                        heatingEmissionsPerYear = electricityConsumptionPerMonth * MonthsInYear * OilEmissionsFactor;
+                        heatingFactor = OilEmissionsFactor;
                         break;
                     case "WoodPellet":
-                        heatingEmissionsPerYear = electricityConsumptionPerMonth * MonthsInYear * WoodPelletEmissionsFactor;
+                        heatingFactor = WoodPelletEmissionsFactor;
                         break;
                     case "HeatPump":
-                        heatingEmissionsPerYear = electricityConsumptionPerMonth * MonthsInYear * HeatPumpEmissionsFactor;
+                        heatingFactor = HeatPumpEmissionsFactor;
                         break;
                     case "Solar":
-                        heatingEmissionsPerYear = SolarEmissionsFactor;
+                        heatingFactor = SolarEmissionsFactor;
                         break;
                     case "Electric":
-                        heatingEmissionsPerYear = electricityConsumptionPerMonth * MonthsInYear * ElectricHeatingEmissionsFactor;
+                        heatingFactor = ElectricHeatingEmissionsFactor;
                         break;
                 }
 
-                // appliance usage
-                double applianceEmissionsPerYear = applianceUsagePerDay * HoursInYear * ApplianceEmissionsFactor;
+                heatingEmissionsPerYear = electricityConsumptionPerMonth * MonthsInYear * heatingFactor;
 
-                // renewable energy usage
+                double applianceEmissionsPerYear = applianceUsagePerDay * DaysInYear * ApplianceEmissionsFactor;
+
                 if (renewableEnergy == "Yes")
                 {
                     electricityEmissionsPerYear *= (1 - RenewableEnergyReductionFactor);
@@ -134,9 +127,87 @@ namespace EnvironmentalSustainabilityApp.Controllers
             }
         }
 
-        public IActionResult Transportation()
+        public async Task<IActionResult> Transportation()
         {
+            var currentUser = await GetApplicationUser();
+            decimal? carbonFootprintResult = _dbUtil.GetCarbonFootprintByCategory(currentUser.Id, CommonUtil.Transportation);
+            bool hasResult = false;
+
+            if (carbonFootprintResult.HasValue)
+                hasResult = true;
+            else
+                carbonFootprintResult = 0;
+
+            ViewBag.CarbonFootprintResult = carbonFootprintResult.ToString();
+            ViewBag.HasCarbonFootprintResult = hasResult;
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CalculateTransportationFootprint(TransportationViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // in kg CO2 per kilometer
+                const double DrivingEmissionsPetrol = 0.54689; 
+                const double DrivingEmissionsDiesel = 0.54689;
+                const double DrivingEmissionsHybrid = 0.38544;
+                const double DrivingEmissionsElectric = 0.177;
+                const double DrivingEmissionsOther = 0.563;
+                const double FlightEmissionsFactor = 1.206; // (per passenger kilometer)
+                const int FlightAverageKm = 1500;
+                const double PublicTransportEmissionsFactor = 0.338;
+                const int PublicTransportAverageKmPerWeek = 30;
+                const int WeeksInYear = 52;
+
+                double kilometersDrivenPerWeek = model.KilometersDriven;
+                int flightsTakenPerYear = model.FlightsTaken;
+                string fuelType = model.FuelType;
+                int numberOfVehicles = model.NumberOfVehicles;
+                bool usesPublicTransport = model.UsesPublicTransport;
+
+                double drivingEmissions = 0;
+                double fuelEmissionsFactor = 0;
+                switch (fuelType)
+                {
+                    case "Petrol":
+                        fuelEmissionsFactor = DrivingEmissionsPetrol;
+                        break;
+                    case "Diesel":
+                        fuelEmissionsFactor = DrivingEmissionsDiesel;
+                        break;
+                    case "Electric":
+                        fuelEmissionsFactor = DrivingEmissionsElectric;
+                        break;
+                    case "Hybrid":
+                        fuelEmissionsFactor = DrivingEmissionsHybrid;
+                        break;
+                    case "Other":
+                        fuelEmissionsFactor = DrivingEmissionsOther;
+                        break;
+                }
+
+                drivingEmissions = (kilometersDrivenPerWeek * WeeksInYear * fuelEmissionsFactor) / numberOfVehicles;
+
+                double flightEmissions = flightsTakenPerYear * FlightAverageKm * FlightEmissionsFactor;
+
+                double publicTransportEmissions = 0;
+                if (usesPublicTransport)
+                {
+                    publicTransportEmissions = PublicTransportAverageKmPerWeek * WeeksInYear * PublicTransportEmissionsFactor;
+                }
+
+                double carbonFootprintPerPersonPerYear = drivingEmissions + flightEmissions + publicTransportEmissions;
+
+                var currentUser = await GetApplicationUser();
+                _dbUtil.SaveCarbonFootprintByCategory(currentUser.Id, CommonUtil.Transportation, (decimal)carbonFootprintPerPersonPerYear);
+
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
 
         public IActionResult FoodAndDiet()

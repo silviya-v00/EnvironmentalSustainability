@@ -210,9 +210,60 @@ namespace EnvironmentalSustainabilityApp.Controllers
             }
         }
 
-        public IActionResult FoodAndDiet()
+        public async Task<IActionResult> FoodAndDiet()
         {
+            var currentUser = await GetApplicationUser();
+            decimal? carbonFootprintResult = _dbUtil.GetCarbonFootprintByCategory(currentUser.Id, CommonUtil.FoodAndDiet);
+            bool hasResult = false;
+
+            if (carbonFootprintResult.HasValue)
+                hasResult = true;
+            else
+                carbonFootprintResult = 0;
+
+            ViewBag.CarbonFootprintResult = carbonFootprintResult.ToString();
+            ViewBag.HasCarbonFootprintResult = hasResult;
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CalculateFoodAndDietFootprint(FoodAndDietViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                const double MeatEmissions = 6.7;
+                const double VegetarianEmissions = 4.0;
+                const double VeganEmissions = 2.0;
+                const double OrganicFoodEmissionsReduction = 0.5;
+                const int WeeksInYear = 52;
+
+                int meatConsumption = model.MeatConsumption;
+                int vegetarianMeals = model.VegetarianMeals;
+                int veganMeals = model.VeganMeals;
+                bool organicFood = model.OrganicFood;
+
+                double meatEmissionsTotal = meatConsumption * MeatEmissions;
+                double vegetarianEmissionsTotal = vegetarianMeals * VegetarianEmissions;
+                double veganEmissionsTotal = veganMeals * VeganEmissions;
+
+                if (organicFood)
+                {
+                    meatEmissionsTotal -= OrganicFoodEmissionsReduction * meatConsumption;
+                    vegetarianEmissionsTotal -= OrganicFoodEmissionsReduction * vegetarianMeals;
+                    veganEmissionsTotal -= OrganicFoodEmissionsReduction * veganMeals;
+                }
+
+                double totalCarbonFootprint = (meatEmissionsTotal + vegetarianEmissionsTotal + veganEmissionsTotal) * WeeksInYear;
+
+                var currentUser = await GetApplicationUser();
+                _dbUtil.SaveCarbonFootprintByCategory(currentUser.Id, CommonUtil.FoodAndDiet, (decimal)totalCarbonFootprint);
+
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
 
         public IActionResult WasteManagement()

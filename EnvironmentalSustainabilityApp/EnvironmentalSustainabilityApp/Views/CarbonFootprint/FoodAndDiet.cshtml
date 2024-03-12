@@ -1,3 +1,82 @@
-﻿@{
+﻿@model FoodAndDietViewModel
+
+@{
     ViewData["Title"] = "Food and Diet";
+    string nextAction = "WasteManagement";
+    string nextController = "CarbonFootprint";
+}
+
+@section Styles {
+    <style>
+        .food-diet-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+}
+
+<div class="container mt-4" style="padding: 20px 60px;">
+    <div class="row">
+        <div class="col-md-4" style="text-align: center;">
+            <div id="carbon-emissions-result" class="result-section">
+                <h4 class="mt-4">Carbon Footprint:</h4>
+                <p>Based on your answers, your estimated food and diet carbon footprint is <strong>@ViewBag.CarbonFootprintResult tonnes of CO2 per year</strong>.</p>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="food-diet-container">
+                <h2 class="mb-4" style="text-align: center;">Food and Diet</h2>
+                <form id="food-diet-form" asp-action="CalculateFoodAndDietFootprint" method="post">
+                    <div class="form-group">
+                        <label for="MeatConsumption">How many times a week do you eat meat?</label>
+                        <input type="number" id="MeatConsumption" name="MeatConsumption" class="form-control" min="0" step="1" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="VegetarianMeals">How many vegetarian meals do you have per week?</label>
+                        <input type="number" id="VegetarianMeals" name="VegetarianMeals" class="form-control" min="0" step="1" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="VeganMeals">How many vegan meals do you have per week?</label>
+                        <input type="number" id="VeganMeals" name="VeganMeals" class="form-control" min="0" step="1" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="OrganicFood">Do you regularly consume organic food?</label>
+                        <select id="OrganicFood" name="OrganicFood" class="form-control" required>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn">@((bool)ViewBag.HasCarbonFootprintResult ? "Re-Calculate" : "Calculate")</button>
+                        <a href="@Url.Action(nextAction, nextController)" class="btn btn-secondary">Continue</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#food-diet-form').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'post',
+                data: $(this).serialize(),
+                success: function () {
+                    window.location.href = '@Url.Action(nextAction, nextController)';
+                }
+            });
+        });
+    </script>
 }

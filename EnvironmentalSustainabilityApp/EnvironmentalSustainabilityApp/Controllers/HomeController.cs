@@ -49,17 +49,27 @@ namespace EnvironmentalSustainabilityApp.Controllers
             bool noneCategoriesCompleted = false;
             bool someCategoriesCompleted = false;
             List<(string CategoryName, string PageName)> categoriesNotCompleted = new List<(string, string)>();
+            string[] chartLabels = new string[] { };
+            decimal?[] chartDataUser = new decimal?[] { };
+            decimal?[] chartDataTotalAvg = new decimal?[] { };
+            decimal userTotalCarbonFootprint = 0;
 
             var currentUser = await GetApplicationUser();
-            var carbonFootprintResult = _dbUtil.GetCarbonFootprintResult(currentUser.Id);
+            var carbonFootprintTestState = _dbUtil.GetCarbonFootprintTestState(currentUser.Id);
 
-            if (carbonFootprintResult.Count == 0)
+            if (carbonFootprintTestState.Count == 0)
             {
                 allCategoriesCompleted = true;
+
+                var chartData = _dbUtil.GetCarbonFootprintChartData(currentUser.Id);
+                chartLabels = chartData.OrderBy(x => x.Seq).Select(x => x.CategoryName).ToArray();
+                chartDataUser = chartData.OrderBy(x => x.Seq).Select(x => x.UserResult).ToArray();
+                chartDataTotalAvg = chartData.OrderBy(x => x.Seq).Select(x => x.TotalAvgResult).ToArray();
+                userTotalCarbonFootprint = chartDataUser.Sum(x => x.Value);
             }
             else
             {
-                var firstResult = carbonFootprintResult.FirstOrDefault();
+                var firstResult = carbonFootprintTestState.FirstOrDefault();
 
                 if (firstResult.CompletedCategoryCount == 0)
                 {
@@ -70,7 +80,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
                     if (firstResult.CompletedCategoryCount < firstResult.TotalCategoryCount)
                     {
                         someCategoriesCompleted = true;
-                        categoriesNotCompleted = carbonFootprintResult.Select(x => (x.CarbonFootprintCategoryName, CommonUtil.GetPageName(x.CarbonFootprintCategoryKey))).ToList(); ;
+                        categoriesNotCompleted = carbonFootprintTestState.Select(x => (x.CarbonFootprintCategoryName, CommonUtil.GetPageName(x.CarbonFootprintCategoryKey))).ToList(); ;
                     }
                 }
             }
@@ -79,6 +89,11 @@ namespace EnvironmentalSustainabilityApp.Controllers
             ViewBag.NoneCategoriesCompleted = noneCategoriesCompleted;
             ViewBag.SomeCategoriesCompleted = someCategoriesCompleted;
             ViewBag.CategoriesNotCompleted = categoriesNotCompleted;
+            ViewBag.ChartLabels = chartLabels;
+            ViewBag.ChartDataUser = chartDataUser;
+            ViewBag.ChartDataTotalAvg = chartDataTotalAvg;
+            ViewBag.UserTotalCarbonFootprint = userTotalCarbonFootprint;
+
             return View(featuredContent);
         }
 

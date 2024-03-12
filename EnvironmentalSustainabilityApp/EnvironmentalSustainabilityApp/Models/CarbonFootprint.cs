@@ -5,29 +5,20 @@ using System.Threading.Tasks;
 
 namespace EnvironmentalSustainabilityApp.Models
 {
-    public class CarbonFootprintCategory
-    {
-        public int CarbonFootprintCategoryID { get; set; }
-        public string CarbonFootprintCategoryKey { get; set; }
-        public string CarbonFootprintCategoryName { get; set; }
-    }
-
-    public class CarbonFootprintUser
-    {
-        public int CarbonFootprintID { get; set; }
-        public string UserID { get; set; }
-        public int CarbonFootprintCategoryID { get; set; }
-        public decimal CarbonFootprintResult { get; set; }
-        public CarbonFootprintCategory CFCategory { get; set; }
-    }
-
-    public class CarbonFootprintTestResult
+    public class CarbonFootprintTestState
     {
         public int? CompletedCategoryCount { get; set; }
         public int? TotalCategoryCount { get; set; }
         public int? CarbonFootprintCategoryID { get; set; }
         public string CarbonFootprintCategoryKey { get; set; }
         public string CarbonFootprintCategoryName { get; set; }
-        public decimal? CarbonFootprintResult { get; set; }
+    }
+
+    public class CarbonFootprintChartData
+    {
+        public string CategoryName { get; set; }
+        public decimal? UserResult { get; set; }
+        public decimal? TotalAvgResult { get; set; }
+        public int? Seq { get; set; }
     }
 }

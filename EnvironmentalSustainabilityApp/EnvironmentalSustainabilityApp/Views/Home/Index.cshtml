@@ -5,8 +5,29 @@
 
 @section Styles {
     <style>
+        .result-row {
+            margin-bottom: 20px;
+        }
+
+        .result-col {
+            margin: 10px;
+        }
+
+        .user-data {
+            background-color: rgba(245, 245, 220, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-data-result {
+            display: flex;
+            align-items: center;
+        }
+
         .card {
             height: 300px;
+            border-radius: 30px;
         }
 
         .col-card {
@@ -25,21 +46,46 @@
             text-overflow: ellipsis;
             max-height: 80px;
         }
+
+        img {
+            border-radius: 30px 30px 0 0 !important;
+        }
     </style>
 }
 
-<div style="background-color: #bbdccf;">
-    <div class="text-center">
-        <h1 class="display-4">Welcome</h1>
-    </div>
-
+<div style="background-color: #bbdccf; margin-top: 50px;">
     @if (ViewBag.AllCategoriesCompleted)
     {
         <div class="container mt-4">
             <div class="row justify-content-center">
                 <div class="col-md-8 text-center">
-                    <h3>Your Carbon Footprint Test Results</h3>
-                    <p>You haven completed the carbon footprint test</p>
+                    <h2>Carbon Footprint Results</h2>
+                    <p>(in tonnes of CO<sub>2</sub> per year)</p>
+                    <div class="row result-row">
+                        <div class="col result-col">
+                            <canvas id="pieChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="col result-col user-data user-data-result">
+                            <p>Based on your answers, your estimated energy carbon footprint is <strong>@ViewBag.UserTotalCarbonFootprint tonnes of CO<sub>2</sub> per year</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="row result-row">
+                        <div class="col result-col">
+                            <canvas id="barChart" width="700" height="300"></canvas>
+                        </div>
+                    </div>
+                    <div class="row result-row">
+                        <div class="col result-col user-data">
+                            <p><strong>Tips to help you live more sustainably</strong></p>
+                            <ol style="text-align: left;">
+                                <li>Reduce, Reuse, Recycle: Minimize waste and recycle materials.</li>
+                                <li>Conserve Energy: Turn off lights and appliances, use energy-efficient options.</li>
+                                <li>Use Water Wisely: Fix leaks, save water, and collect rainwater.</li>
+                                <li>Sustainable Transportation: Walk, bike, carpool, or use public transport.</li>
+                                <li>Support Sustainable Products: Choose eco-friendly options and buy locally.</li>
+                            </ol>
+                        </div>
+                    </div>
                     <a href="@Url.Action("EnergyUsage", "CarbonFootprint")" class="btn btn-system">Retake Test</a>
                 </div>
             </div>
@@ -50,7 +96,7 @@
         <div class="container mt-4">
             <div class="row justify-content-center">
                 <div class="col-md-8 text-center">
-                    <h3>Start Your Carbon Footprint Test</h3>
+                    <h2>Start Your Carbon Footprint Test</h2>
                     <p>You haven't completed the carbon footprint test yet</p>
                     <a href="@Url.Action("EnergyUsage", "CarbonFootprint")" class="btn btn-system">Start Test</a>
                 </div>
@@ -62,14 +108,14 @@
         <div class="container mt-4">
             <div class="row justify-content-center">
                 <div class="col-md-8 text-center">
-                    <h3>Complete Your Carbon Footprint Test</h3>
+                    <h2>Complete Your Carbon Footprint Test</h2>
                     <p>You haven't completed the carbon footprint test for the following categories:</p>
                     <div class="row">
                         @foreach (var category in ViewBag.CategoriesNotCompleted)
                         {
-                        <div class="col">
-                            <a href="@Url.Action((string)category.Item2, "CarbonFootprint")" class="btn btn-system">@category.Item1</a>
-                        </div>
+                            <div class="col">
+                                <a href="@Url.Action((string)category.Item2, "CarbonFootprint")" class="btn btn-system">@category.Item1</a>
+                            </div>
                         }
                     </div>
                 </div>
@@ -123,3 +169,71 @@
         </a>
     </div>
 </div>
+
+@section Scripts {
+    @if (ViewBag.AllCategoriesCompleted) {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+        var pieCtx = document.getElementById('pieChart').getContext('2d');
+        var pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels)),
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
+                    backgroundColor: [
+                        'rgba(128, 128, 128, 0.5)',
+                        'rgba(245, 245, 220, 0.5)',
+                        'rgba(33, 235, 220, 0.5)',
+                        'rgba(70, 130, 180, 0.5)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Carbon Footprint by Category'
+                    }
+                }
+            }
+        });
+
+        var barCtx = document.getElementById('barChart').getContext('2d');
+        var barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels)),
+                datasets: [{
+                    label: 'Your',
+                    data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
+                    backgroundColor: 'rgba(33, 235, 220, 0.5)',
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 2
+                }, {
+                    label: 'Average',
+                    data: @Html.Raw(Json.Serialize(ViewBag.ChartDataTotalAvg)),
+                    backgroundColor: 'rgba(128, 128, 128, 0.5)',
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Your vs. Average Carbon Footprint'
+                    }
+                }
+            }
+        });
+        </script>
+    }
+}

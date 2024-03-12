@@ -16,9 +16,9 @@ namespace EnvironmentalSustainabilityApp.Utils
             _connectionString = connectionString;
         }
 
-        public List<CarbonFootprintTestResult> GetCarbonFootprintResult(string userID)
+        public List<CarbonFootprintTestState> GetCarbonFootprintTestState(string userID)
         {
-            List<CarbonFootprintTestResult> carbonFootprints = new List<CarbonFootprintTestResult>();
+            List<CarbonFootprintTestState> carbonFootprints = new List<CarbonFootprintTestState>();
             var sqlConn = new SqlConnection(_connectionString);
             sqlConn.Open();
 
@@ -38,21 +38,19 @@ namespace EnvironmentalSustainabilityApp.Utils
                                 IF @AllCategoriesCompleted = 0
                                 BEGIN
                                     INSERT INTO @CategoriesNotCompleted (CarbonFootprintCategoryID, CarbonFootprintCategoryKey, CarbonFootprintCategoryName)
-                                    SELECT c.CarbonFootprintCategoryID, c.CarbonFootprintCategoryKey, c.CarbonFootprintCategoryName
-                                    FROM dbo.CarbonFootprintCategories c
-                                    LEFT OUTER JOIN dbo.CarbonFootprintUser u ON c.CarbonFootprintCategoryID = u.CarbonFootprintCategoryID
-                                    WHERE u.CarbonFootprintID IS NULL
+									SELECT c.CarbonFootprintCategoryID, c.CarbonFootprintCategoryKey, c.CarbonFootprintCategoryName
+									FROM dbo.CarbonFootprintCategories c
+									LEFT OUTER JOIN dbo.CarbonFootprintUser u ON c.CarbonFootprintCategoryID = u.CarbonFootprintCategoryID AND u.UserID = @UserID
+									WHERE u.CarbonFootprintID IS NULL
                                 END
-
-                                SELECT
-                                    @CompletedCategoryCount as CompletedCategoryCount,
-	                                @TotalCategoryCount as TotalCategoryCount,
-                                    a.CarbonFootprintCategoryID,
-                                    a.CarbonFootprintCategoryKey,
-                                    a.CarbonFootprintCategoryName,
-	                                b.CarbonFootprintResult
-                                FROM @CategoriesNotCompleted a
-                                LEFT OUTER JOIN dbo.CarbonFootprintUser b on a.CarbonFootprintCategoryID = b.CarbonFootprintCategoryID and b.UserID = @UserID";
+																					
+								SELECT
+									@CompletedCategoryCount as CompletedCategoryCount,
+									@TotalCategoryCount as TotalCategoryCount,
+									a.CarbonFootprintCategoryID,
+									a.CarbonFootprintCategoryKey,
+									a.CarbonFootprintCategoryName
+								FROM @CategoriesNotCompleted a";
 
                 SqlCommand command = new SqlCommand(SQL, sqlConn);
                 command.Parameters.Add("@UserID", System.Data.SqlDbType.NVarChar).Value = userID;
@@ -60,7 +58,7 @@ namespace EnvironmentalSustainabilityApp.Utils
 
                 while (dataReader.Read())
                 {
-                    CarbonFootprintTestResult testResult = new CarbonFootprintTestResult();
+                    CarbonFootprintTestState testResult = new CarbonFootprintTestState();
 
                     if (dataReader["CompletedCategoryCount"] is int)
                         testResult.CompletedCategoryCount = (int)dataReader["CompletedCategoryCount"];
@@ -74,9 +72,6 @@ namespace EnvironmentalSustainabilityApp.Utils
                     testResult.CarbonFootprintCategoryKey = dataReader["CarbonFootprintCategoryKey"].ToString();
                     testResult.CarbonFootprintCategoryName = dataReader["CarbonFootprintCategoryName"].ToString();
 
-                    if (dataReader["CarbonFootprintResult"] is decimal)
-                        testResult.CarbonFootprintResult = (decimal)dataReader["CarbonFootprintResult"] / 1000; // convert from kg to tons
-
                     carbonFootprints.Add(testResult);
                 }
 
@@ -88,6 +83,57 @@ namespace EnvironmentalSustainabilityApp.Utils
             }
 
             return carbonFootprints;
+        }
+
+        public List<CarbonFootprintChartData> GetCarbonFootprintChartData(string userID)
+        {
+            List<CarbonFootprintChartData> chartData = new List<CarbonFootprintChartData>();
+            var sqlConn = new SqlConnection(_connectionString);
+            sqlConn.Open();
+
+            try
+            {
+                string SQL = @"
+                                SELECT c.CarbonFootprintCategoryName as CategoryName,
+	                                   u.CarbonFootprintResult as UserResult,
+	                                   total.CarbonFootprintResult as TotalAvgResult,
+	                                   ROW_NUMBER() OVER (ORDER BY (SELECT 1)) as Seq
+                                FROM CarbonFootprintCategories c
+                                LEFT OUTER JOIN CarbonFootprintUser u ON c.CarbonFootprintCategoryID = u.CarbonFootprintCategoryID AND u.UserID = @UserID
+                                LEFT OUTER JOIN (SELECT CarbonFootprintCategoryID, AVG(CarbonFootprintResult) as CarbonFootprintResult
+				                                 FROM CarbonFootprintUser
+				                                 GROUP BY CarbonFootprintCategoryID) total ON c.CarbonFootprintCategoryID = total.CarbonFootprintCategoryID";
+
+                SqlCommand command = new SqlCommand(SQL, sqlConn);
+                command.Parameters.Add("@UserID", System.Data.SqlDbType.NVarChar).Value = userID;
+                SqlDataReader dataReader = command.ExecuteReader();
+
+                while (dataReader.Read())
+                {
+                    CarbonFootprintChartData row = new CarbonFootprintChartData();
+
+                    row.CategoryName = dataReader["CategoryName"].ToString();
+
+                    if (dataReader["UserResult"] is decimal)
+                        row.UserResult = Math.Round((decimal)dataReader["UserResult"] / 1000, 3); // convert from kg to tons
+
+                    if (dataReader["TotalAvgResult"] is decimal)
+                        row.TotalAvgResult = Math.Round((decimal)dataReader["TotalAvgResult"] / 1000, 3); // convert from kg to tons
+
+                    if (dataReader["Seq"] is int)
+                        row.Seq = (int)dataReader["Seq"];
+
+                    chartData.Add(row);
+                }
+
+                dataReader.Close();
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+
+            return chartData;
         }
 
         public decimal? GetCarbonFootprintByCategory(string userID, string categoryKey)

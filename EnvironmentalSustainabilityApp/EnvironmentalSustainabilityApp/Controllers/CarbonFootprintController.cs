@@ -302,8 +302,8 @@ namespace EnvironmentalSustainabilityApp.Controllers
                 double recyclingEmissions = 0;
                 if (percentageRecycled != 0)
                 {
-                    wasteEmissions = ((100 - percentageRecycled) / 100) * wasteProducedPerWeek * WasteEmissionFactor;
-                    recyclingEmissions = (percentageRecycled / 100) * wasteProducedPerWeek * RecyclingEmissionFactor;
+                    wasteEmissions = ((100 - (double)percentageRecycled) / 100) * wasteProducedPerWeek * WasteEmissionFactor;
+                    recyclingEmissions = ((double)percentageRecycled / 100) * wasteProducedPerWeek * RecyclingEmissionFactor;
                 }
 
                 double totalEmissions = (wasteEmissions + recyclingEmissions + transportEmissions) * WeeksInYear;

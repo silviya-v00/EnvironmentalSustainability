@@ -197,10 +197,10 @@ namespace EnvironmentalSustainabilityApp.Controllers
                     publicTransportEmissions = PublicTransportAverageKmPerWeek * WeeksInYear * PublicTransportEmissionsFactor;
                 }
 
-                double carbonFootprintPerPersonPerYear = drivingEmissions + flightEmissions + publicTransportEmissions;
+                double totalEmissions = drivingEmissions + flightEmissions + publicTransportEmissions;
 
                 var currentUser = await GetApplicationUser();
-                _dbUtil.SaveCarbonFootprintByCategory(currentUser.Id, CommonUtil.Transportation, (decimal)carbonFootprintPerPersonPerYear);
+                _dbUtil.SaveCarbonFootprintByCategory(currentUser.Id, CommonUtil.Transportation, (decimal)totalEmissions);
 
                 return Ok();
             }
@@ -253,10 +253,10 @@ namespace EnvironmentalSustainabilityApp.Controllers
                     veganEmissionsTotal -= OrganicFoodEmissionsReduction * veganMeals;
                 }
 
-                double totalCarbonFootprint = (meatEmissionsTotal + vegetarianEmissionsTotal + veganEmissionsTotal) * WeeksInYear;
+                double totalEmissions = (meatEmissionsTotal + vegetarianEmissionsTotal + veganEmissionsTotal) * WeeksInYear;
 
                 var currentUser = await GetApplicationUser();
-                _dbUtil.SaveCarbonFootprintByCategory(currentUser.Id, CommonUtil.FoodAndDiet, (decimal)totalCarbonFootprint);
+                _dbUtil.SaveCarbonFootprintByCategory(currentUser.Id, CommonUtil.FoodAndDiet, (decimal)totalEmissions);
 
                 return Ok();
             }
@@ -266,9 +266,57 @@ namespace EnvironmentalSustainabilityApp.Controllers
             }
         }
 
-        public IActionResult WasteManagement()
+        public async Task<IActionResult> WasteManagement()
         {
+            var currentUser = await GetApplicationUser();
+            decimal? carbonFootprintResult = _dbUtil.GetCarbonFootprintByCategory(currentUser.Id, CommonUtil.WasteManagement);
+            bool hasResult = false;
+
+            if (carbonFootprintResult.HasValue)
+                hasResult = true;
+            else
+                carbonFootprintResult = 0;
+
+            ViewBag.CarbonFootprintResult = carbonFootprintResult.ToString();
+            ViewBag.HasCarbonFootprintResult = hasResult;
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CalculateWasteManagementFootprint(WasteManagementViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // in kg CO2
+                const double WasteEmissionFactor = 1.5;
+                const double RecyclingEmissionFactor = 0.5;
+                const double TransportEmissionFactor = 0.15;
+                const int WeeksInYear = 52;
+
+                int wasteProducedPerWeek = model.WasteProducedPerWeek;
+                int percentageRecycled = model.PercentageRecycled;
+
+                double wasteEmissions = wasteProducedPerWeek * WasteEmissionFactor;
+                double transportEmissions = wasteProducedPerWeek * TransportEmissionFactor;
+
+                double recyclingEmissions = 0;
+                if (percentageRecycled != 0)
+                {
+                    wasteEmissions = ((100 - percentageRecycled) / 100) * wasteProducedPerWeek * WasteEmissionFactor;
+                    recyclingEmissions = (percentageRecycled / 100) * wasteProducedPerWeek * RecyclingEmissionFactor;
+                }
+
+                double totalEmissions = (wasteEmissions + recyclingEmissions + transportEmissions) * WeeksInYear;
+
+                var currentUser = await GetApplicationUser();
+                _dbUtil.SaveCarbonFootprintByCategory(currentUser.Id, CommonUtil.WasteManagement, (decimal)totalEmissions);
+
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
     }
 }

@@ -3,10 +3,14 @@ $(document).ready(function () {
     $('#add-new-content').click(function () {
         $('#content-menu .nav-link').removeClass('active');
         $(this).addClass('active');
+        ResetForm();
+    });
 
+    function ResetForm() {
         $('#content-form')[0].reset();
         $('#selected-image').hide();
-    });
+        $('#panel-img #ExistingContentImageFileName').remove();
+    }
 
     LoadContentList();
 
@@ -40,6 +44,8 @@ $(document).ready(function () {
             type: 'GET',
             data: { contentId: contentId },
             success: function (data) {
+                ResetForm();
+
                 $('#ContentTitle').val(data.contentTitle);
                 $('#ContentDescription').val(data.contentDescription);
                 $('#ContentLink').val(data.contentLink);
@@ -49,8 +55,6 @@ $(document).ready(function () {
                     var imageUrl = '/Home/GetContentImage?fileName=' + encodeURIComponent(data.contentImageFileName);
                     $('#selected-image').attr('src', imageUrl).show();
                     $('#panel-img').append('<input type="hidden" id="ExistingContentImageFileName" name="ExistingContentImageFileName" value="' + data.contentImageFileName + '">');
-                } else {
-                    $('#selected-image').hide();
                 }
             },
             error: function () {

@@ -382,7 +382,8 @@ namespace EnvironmentalSustainabilityApp.Controllers
 
             if (content.ContentImage != null && content.ContentImage.Length > 0)
             {
-                content.ContentImageFileName = Guid.NewGuid().ToString() + ".jpg";
+                string extension = Path.GetExtension(content.ContentImage.FileName);
+                content.ContentImageFileName = Guid.NewGuid().ToString() + extension;
 
                 string imagePath = Path.Combine(imageFolderPath, content.ContentImageFileName);
                 using (var fileStream = new FileStream(imagePath, FileMode.Create))

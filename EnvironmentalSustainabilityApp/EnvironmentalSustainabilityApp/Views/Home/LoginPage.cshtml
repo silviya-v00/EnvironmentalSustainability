@@ -61,7 +61,7 @@
             @if (ViewData["ErrorMessage"] != null)
             {
                 <div id="msgError" class="alert alert-danger">
-                    @ViewData["ErrorMessage"]
+                    @Html.Raw(ViewData["ErrorMessage"])
                 </div>
             }
         </div>

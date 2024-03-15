@@ -136,6 +136,6 @@ body {
     margin-top: 10px;
     color: #d9534f;
     position: absolute;
-    top: 90%;
+    bottom: 0px;
     z-index: 9999;
 }

@@ -97,9 +97,15 @@ namespace EnvironmentalSustainabilityApp.Controllers
             return View(featuredContent);
         }
 
-        public IActionResult LoginPage()
+        public async Task<IActionResult> LoginPage()
         {
-            return View();
+            var userName = User.Identity.Name;
+            var existingUser = await _userManager.FindByNameAsync(String.IsNullOrEmpty(userName) ? "" : userName);
+
+            if (existingUser != null)
+                return await RedirectToHomeByRole(existingUser);
+            else
+                return View();
         }
 
         [HttpGet]
@@ -194,7 +200,9 @@ namespace EnvironmentalSustainabilityApp.Controllers
             }
             else
             {
-                ViewData["ErrorMessage"] = "Registration failed. Please try again.";
+                List<IdentityError> errorList = result.Errors.ToList();
+                var errors = string.Join("<br/>", errorList.Select(e => e.Description));
+                ViewData["ErrorMessage"] = errors;
                 return View("LoginPage", ViewBag.ActiveTab = "register");
             }
         }

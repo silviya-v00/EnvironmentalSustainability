@@ -3,16 +3,19 @@
 @inject UserManager<IdentityUser> UserManager
 @{
     string homeAction = "Index";
+    bool showCarbonFootprintTest = false;
 
     if (SignInManager.IsSignedIn(User))
     {
         if (User.IsInRole("ADMIN"))
         {
             homeAction = "AdminHome";
+            showCarbonFootprintTest = false;
         }
         else
         {
             homeAction = "Index";
+            showCarbonFootprintTest = true;
         }
     }
 }
@@ -73,21 +76,24 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="@homeAction">Home</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="EnergyUsage">Energy Usage</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="Transportation">Transportation</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="FoodAndDiet">Food and Diet</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="WasteManagement">Waste Management</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AirQuality">Air Quality</a>
-                            </li>
+                            @if (showCarbonFootprintTest)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="EnergyUsage">Energy Usage</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="Transportation">Transportation</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="FoodAndDiet">Food and Diet</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="WasteManagement">Waste Management</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AirQuality">Air Quality</a>
+                                </li>
+                            }
                         </ul>
                     </div>
                 </div>

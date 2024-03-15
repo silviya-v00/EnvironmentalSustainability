@@ -18,10 +18,7 @@
                 </div>
             </div>
             <div class="col-md-9" id="content-details" style="padding: 0 80px 0 80px;">
-                <form id="content-form" method="post" asp-controller="Home" asp-action="SaveContent" novalidate="novalidate">
-                    <div class="text-danger validation-summary-valid content-msg">
-                        @Html.ValidationSummary(true)
-                    </div>
+                <form id="content-form" method="post" asp-controller="Home" asp-action="SaveContent">
                     <div class="row">
                         <div class="col-md-5">
                             <div class="form-group" id="panel-img">
@@ -32,8 +29,8 @@
                                 </div>
                                 <div id="image-container" style="max-width: 100%; max-height: 200px; margin-top: 10px;">
                                     <img id="selected-image" src="#" alt="Selected Image" style="max-width: 100%; max-height: 200px; display: none;">
-                                    <div id="image-overlay"></div>
-                                    <div id="remove-image-overlay">
+                                    <div id="image-overlay" style="display: none;"></div>
+                                    <div id="remove-image-overlay" style="display: none;">
                                         <span id="remove-image-icon">&#10006;</span>
                                     </div>
                                 </div>
@@ -57,6 +54,8 @@
                             <div class="form-group">
                                 <label for="IsContentActive">Is Content Active?</label>
                                 <input type="checkbox" id="IsContentActive" name="IsContentActive" checked>
+                            </div>
+                            <div id="errorMsg" class="alert alert-danger" style="display: none;">
                             </div>
                             <button id="save-content" type="submit" class="btn">Save</button>
                             <button id="delete-content" type="button" class="btn">Delete</button>

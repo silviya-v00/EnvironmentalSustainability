@@ -10,6 +10,16 @@ $(document).ready(function () {
         $('#content-form')[0].reset();
         $('#selected-image').hide();
         $('#panel-img #ExistingContentImageFileName').remove();
+        ShowHideImageOverlay(false);
+    }
+
+    function ShowHideImageOverlay(show) {
+        var cssDisplay = "none";
+        if (show)
+            cssDisplay = "";
+
+        $("#image-overlay").css("display", cssDisplay);
+        $("#remove-image-overlay").css("display", cssDisplay);
     }
 
     LoadContentList();
@@ -52,6 +62,8 @@ $(document).ready(function () {
                 $('#IsContentActive').prop('checked', data.isContentActive);
 
                 if (data.contentImageFileName) {
+                    ShowHideImageOverlay(true);
+
                     var imageUrl = '/Home/GetContentImage?fileName=' + encodeURIComponent(data.contentImageFileName);
                     $('#selected-image').attr('src', imageUrl).show();
                     $('#panel-img').append('<input type="hidden" id="ExistingContentImageFileName" name="ExistingContentImageFileName" value="' + data.contentImageFileName + '">');
@@ -66,43 +78,80 @@ $(document).ready(function () {
     $('#save-content').click(function (e) {
         e.preventDefault();
 
-        var formData = new FormData($('#content-form')[0]);
+        if (IsContentDataValid()) {
+            var formData = new FormData($('#content-form')[0]);
 
-        var contentId = 0;
-        var activeNavItem = $('.nav-link.active[data-content-id]');
-        if (activeNavItem.length > 0) {
-            contentId = activeNavItem.data('content-id');
-        }
-        formData.append('ContentID', contentId);
-
-        var existingImage = "";
-        var existingImageItem = $('#ExistingContentImageFileName');
-        if (existingImageItem.length > 0) {
-            existingImage = existingImageItem.val();
-        }
-        formData.append('ExistingContentImageFileName', existingImage);
-
-        var imageFile = $('#ContentImage')[0].files[0];
-        formData.append('ContentImage', imageFile);
-
-        var isContentActiveString = formData.get('IsContentActive');
-        var isContentActive = isContentActiveString === 'on';
-        formData.set('IsContentActive', isContentActive);
-
-        $.ajax({
-            url: '/Home/SaveContent',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function () {
-                location.reload();
-            },
-            error: function () {
-                alert('An error occurred while saving content.');
+            var contentId = 0;
+            var activeNavItem = $('.nav-link.active[data-content-id]');
+            if (activeNavItem.length > 0) {
+                contentId = activeNavItem.data('content-id');
             }
-        });
+            formData.append('ContentID', contentId);
+
+            var existingImage = "";
+            var existingImageItem = $('#ExistingContentImageFileName');
+            if (existingImageItem.length > 0) {
+                existingImage = existingImageItem.val();
+            }
+            formData.append('ExistingContentImageFileName', existingImage);
+
+            var imageFile = $('#ContentImage')[0].files[0];
+            formData.append('ContentImage', imageFile);
+
+            var isContentActiveString = formData.get('IsContentActive');
+            var isContentActive = isContentActiveString === 'on';
+            formData.set('IsContentActive', isContentActive);
+
+            $.ajax({
+                url: '/Home/SaveContent',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function () {
+                    location.reload();
+                },
+                error: function () {
+                    alert('An error occurred while saving content.');
+                }
+            });
+        }
     });
+
+    function IsContentDataValid() {
+        $("#errorMsg").text("");
+        $("#errorMsg").css("display", "none");
+
+        var formData = new FormData($('#content-form')[0]);
+        var contentTitle = formData.get('ContentTitle');
+        var contentLink = formData.get('ContentLink');
+
+        if (contentTitle == "") {
+            $("#errorMsg").text("Content Title cannot be empty!");
+            $("#errorMsg").css("display", "");
+
+            return false;
+        }
+
+        if (contentLink == "") {
+            $("#errorMsg").text("Content Link cannot be empty!");
+            $("#errorMsg").css("display", "");
+
+            return false;
+        }
+        else {
+            try {
+                new URL(contentLink);
+
+                return true;
+            } catch (err) {
+                $("#errorMsg").text("Content Link is invalid!");
+                $("#errorMsg").css("display", "");
+
+                return false;
+            }
+        }
+    }
 
     $('#delete-content').click(function () {
         var activeNavItem = $('.nav-link.active[data-content-id]');
@@ -138,11 +187,13 @@ $(document).ready(function () {
             reader.onload = function (e) {
                 selectedImage.src = e.target.result;
                 selectedImage.style.display = 'block';
+                ShowHideImageOverlay(true);
             };
             reader.readAsDataURL(file);
         } else {
             selectedImage.src = '#';
             selectedImage.style.display = 'none';
+            ShowHideImageOverlay(false);
         }
     });
 
@@ -150,5 +201,6 @@ $(document).ready(function () {
         $('#selected-image').attr('src', '').hide();
         $('#ContentImage').val('');
         $('#ExistingContentImageFileName').remove();
+        ShowHideImageOverlay(false);
     });
 });

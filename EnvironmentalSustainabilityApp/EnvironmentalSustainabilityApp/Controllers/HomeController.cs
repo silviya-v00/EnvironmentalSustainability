@@ -53,6 +53,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
             decimal?[] chartDataUser = new decimal?[] { };
             decimal?[] chartDataTotalAvg = new decimal?[] { };
             decimal userTotalCarbonFootprint = 0;
+            decimal avgTotalCarbonFootprint = 0;
 
             var currentUser = await GetApplicationUser();
             var carbonFootprintTestState = _dbUtil.GetCarbonFootprintTestState(currentUser.Id);
@@ -66,6 +67,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
                 chartDataUser = chartData.OrderBy(x => x.Seq).Select(x => x.UserResult).ToArray();
                 chartDataTotalAvg = chartData.OrderBy(x => x.Seq).Select(x => x.TotalAvgResult).ToArray();
                 userTotalCarbonFootprint = chartDataUser.Sum(x => x.Value);
+                avgTotalCarbonFootprint = chartDataTotalAvg.Sum(x => x.Value);
             }
             else
             {
@@ -93,6 +95,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
             ViewBag.ChartDataUser = chartDataUser;
             ViewBag.ChartDataTotalAvg = chartDataTotalAvg;
             ViewBag.UserTotalCarbonFootprint = userTotalCarbonFootprint;
+            ViewBag.AvgTotalCarbonFootprint = avgTotalCarbonFootprint;
 
             return View(featuredContent);
         }

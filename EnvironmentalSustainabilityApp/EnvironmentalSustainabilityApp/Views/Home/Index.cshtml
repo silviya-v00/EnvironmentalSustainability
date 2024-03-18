@@ -10,19 +10,16 @@
         }
 
         .result-col {
-            margin: 10px;
         }
 
         .user-data {
-            background-color: rgba(245, 245, 220, 0.5);
+            background-color: rgb(220 245 237);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-data-result {
             display: flex;
             align-items: center;
+            justify-content: center;
         }
 
         .card {
@@ -62,7 +59,6 @@
             text-align: center;
             vertical-align: middle;
         }
-
     </style>
 }
 
@@ -71,20 +67,20 @@
     {
         <div class="container mt-4">
             <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
+                <div class="col-md-9 text-center" style="max-width: 73.9%;">
                     <h2>Carbon Footprint Results</h2>
                     <p>(in tonnes of CO<sub>2</sub> per year)</p>
                     <div class="row result-row">
-                        <div class="col result-col">
+                        <div class="col result-col user-data">
                             <canvas id="pieChart" width="400" height="200"></canvas>
                         </div>
-                        <div class="col result-col user-data user-data-result">
-                            <p>Based on your answers, your estimated energy carbon footprint is <strong>@ViewBag.UserTotalCarbonFootprint tonnes of CO<sub>2</sub> per year</strong>.</p>
+                        <div class="col result-col user-data" style="margin-left: 20px;">
+                            <p>Based on your answers, your estimated energy carbon footprint is<br/><strong>@ViewBag.UserTotalCarbonFootprint tonnes of CO<sub>2</sub> per year</strong>.</p>
                         </div>
                     </div>
                     <div class="row result-row">
-                        <div class="col result-col">
-                            <canvas id="barChart" width="700" height="300"></canvas>
+                        <div class="col result-col user-data">
+                            <canvas id="barChart" width="750" height="300"></canvas>
                         </div>
                     </div>
                     <div class="row result-row">
@@ -190,69 +186,102 @@
 </div>
 
 @section Scripts {
-    @if (ViewBag.AllCategoriesCompleted) {
+    @if (ViewBag.AllCategoriesCompleted)
+    {
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-        var pieCtx = document.getElementById('pieChart').getContext('2d');
-        var pieChart = new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels)),
-                datasets: [{
-                    data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
-                    backgroundColor: [
-                        'rgba(128, 128, 128, 0.5)',
-                        'rgba(245, 245, 220, 0.5)',
-                        'rgba(33, 235, 220, 0.5)',
-                        'rgba(70, 130, 180, 0.5)'
-                    ]
-                }]
-            },
-            options: {
-                responsive: false,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Carbon Footprint by Category'
+            var pieCtx = document.getElementById('pieChart').getContext('2d');
+            var pieChart = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels)),
+                    datasets: [{
+                        data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
+                        backgroundColor: [
+                            'rgba(176, 38, 250, 0.5)',
+                            'rgba(146, 152, 201, 0.5)',
+                            'rgba(53, 217, 30, 0.5)',
+                            'rgba(26, 100, 44, 0.5)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Carbon Footprint by Category',
+                            font: {
+                                size: 16
+                            }
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        var barCtx = document.getElementById('barChart').getContext('2d');
-        var barChart = new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels)),
-                datasets: [{
-                    label: 'Your',
-                    data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
-                    backgroundColor: 'rgba(33, 235, 220, 0.5)',
-                    borderColor: 'rgba(255, 255, 255, 1)',
-                    borderWidth: 2
-                }, {
-                    label: 'Average',
-                    data: @Html.Raw(Json.Serialize(ViewBag.ChartDataTotalAvg)),
-                    backgroundColor: 'rgba(128, 128, 128, 0.5)',
-                    borderColor: 'rgba(255, 255, 255, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: false,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Your vs. Average Carbon Footprint'
+            var userTotalCarbonFootprintData = Array(@ViewBag.ChartLabels.Length).fill(@ViewBag.UserTotalCarbonFootprint);
+            var avgTotalCarbonFootprintData = Array(@ViewBag.ChartLabels.Length).fill(@ViewBag.AvgTotalCarbonFootprint);
+
+            var barCtx = document.getElementById('barChart').getContext('2d');
+            var barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels)),
+                    datasets: [{
+                        label: 'Your By Category',
+                        data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
+                        backgroundColor: 'rgba(176, 38, 250, 0.5)',
+                        borderColor: 'rgba(255, 255, 255, 1)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Average By Category',
+                        data: @Html.Raw(Json.Serialize(ViewBag.ChartDataTotalAvg)),
+                        backgroundColor: 'rgba(146, 152, 201, 0.5)',
+                        borderColor: 'rgba(255, 255, 255, 1)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Your Total',
+                        data: userTotalCarbonFootprintData,
+                        type: 'line',
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        borderColor: 'rgba(63, 0, 125, 0.5)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Average Total',
+                        data: avgTotalCarbonFootprintData,
+                        type: 'line',
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                        borderColor: 'rgba(26, 100, 44, 0.5)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Your vs. Average Carbon Footprint',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Carbon Footprint'
+                            }
+                        }
                     }
                 }
-            }
-        });
+            });
         </script>
     }
 }

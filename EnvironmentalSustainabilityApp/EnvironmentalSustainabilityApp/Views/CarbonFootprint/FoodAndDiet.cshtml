@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Food and Diet";
+    string prevAction = "Transportation";
+    string prevController = "CarbonFootprint";
     string nextAction = "WasteManagement";
     string nextController = "CarbonFootprint";
 }
@@ -45,8 +47,9 @@
                         </select>
                     </div>
                     <div style="text-align: center;">
+                        <a href="@Url.Action(prevAction, prevController)" class="btn btn-secondary">Back</a>
                         <button type="submit" class="btn">@((bool)ViewBag.HasCarbonFootprintResult ? "Re-Calculate" : "Calculate")</button>
-                        <a href="@Url.Action(nextAction, nextController)" class="btn btn-secondary">Continue</a>
+                        <a href="@Url.Action(nextAction, nextController)" class="btn btn-secondary">Skip</a>
                     </div>
                 </form>
             </div>

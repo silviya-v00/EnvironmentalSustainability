@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Waste Management";
+    string prevAction = "FoodAndDiet";
+    string prevController = "CarbonFootprint";
     string nextAction = "Index";
     string nextController = "Home";
 }
@@ -34,6 +36,7 @@
                         <input type="number" id="PercentageRecycled" name="PercentageRecycled" class="form-control" min="0" max="100" step="1" required />
                     </div>
                     <div style="text-align: center;">
+                        <a href="@Url.Action(prevAction, prevController)" class="btn btn-secondary">Back</a>
                         <button type="submit" class="btn">@((bool)ViewBag.HasCarbonFootprintResult ? "Re-Calculate" : "Calculate")</button>
                         <a href="@Url.Action(nextAction, nextController)" class="btn btn-secondary">Result</a>
                     </div>

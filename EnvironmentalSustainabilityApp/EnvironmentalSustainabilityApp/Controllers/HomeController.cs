@@ -146,7 +146,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
 
         public async Task<RedirectToActionResult> RedirectToHomeByRole(IdentityUser user)
         {
-            if (await _userManager.IsInRoleAsync(user, "ADMIN"))
+            if (await _userManager.IsInRoleAsync(user, CommonUtil.AdminRole))
             {
                 return RedirectToAction("AdminHome", "Home");
             }

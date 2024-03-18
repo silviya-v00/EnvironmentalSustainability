@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using EnvironmentalSustainabilityApp.Utils;
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @{
@@ -7,7 +8,7 @@
 
     if (SignInManager.IsSignedIn(User))
     {
-        if (User.IsInRole("ADMIN"))
+        if (User.IsInRole(CommonUtil.AdminRole))
         {
             homeAction = "AdminHome";
             showCarbonFootprintTest = false;

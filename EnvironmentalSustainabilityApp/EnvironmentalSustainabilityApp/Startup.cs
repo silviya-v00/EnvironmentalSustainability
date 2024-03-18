@@ -1,4 +1,6 @@
 using EnvironmentalSustainabilityApp.Data;
+using EnvironmentalSustainabilityApp.Filters;
+using EnvironmentalSustainabilityApp.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,7 +35,10 @@ namespace EnvironmentalSustainabilityApp
             services.AddDefaultIdentity<IdentityUser>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add(typeof(PageAuthorizationFilter));
+            });
             services.AddRazorPages();
         }
 
@@ -75,7 +80,7 @@ namespace EnvironmentalSustainabilityApp
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var roles = new List<string>()
             {
-                "ADMIN","REGULARUSER"
+                CommonUtil.AdminRole,CommonUtil.RegularUserRole
             };
             IdentityResult roleResult;
 

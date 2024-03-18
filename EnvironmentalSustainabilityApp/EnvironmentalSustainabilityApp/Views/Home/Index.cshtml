@@ -190,6 +190,13 @@
     {
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
+            var whiteColor = 'rgba(255, 255, 255, 1)';
+            var purpleColor = 'rgba(176, 38, 250, 0.5)';
+            var darkPurpleColor = 'rgba(63, 0, 125, 0.5)';
+            var grayColor = 'rgba(146, 152, 201, 0.5)';
+            var lightGreenColor = 'rgba(53, 217, 30, 0.5)';
+            var darkGreenColor = 'rgba(26, 100, 44, 0.5)';
+
             var pieCtx = document.getElementById('pieChart').getContext('2d');
             var pieChart = new Chart(pieCtx, {
                 type: 'pie',
@@ -198,10 +205,10 @@
                     datasets: [{
                         data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
                         backgroundColor: [
-                            'rgba(176, 38, 250, 0.5)',
-                            'rgba(146, 152, 201, 0.5)',
-                            'rgba(53, 217, 30, 0.5)',
-                            'rgba(26, 100, 44, 0.5)'
+                            purpleColor,
+                            grayColor,
+                            lightGreenColor,
+                            darkGreenColor
                         ]
                     }]
                 },
@@ -234,28 +241,28 @@
                     datasets: [{
                         label: 'Your By Category',
                         data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
-                        backgroundColor: 'rgba(176, 38, 250, 0.5)',
-                        borderColor: 'rgba(255, 255, 255, 1)',
+                        backgroundColor: purpleColor,
+                        borderColor: whiteColor,
                         borderWidth: 2
                     }, {
                         label: 'Average By Category',
                         data: @Html.Raw(Json.Serialize(ViewBag.ChartDataTotalAvg)),
-                        backgroundColor: 'rgba(146, 152, 201, 0.5)',
-                        borderColor: 'rgba(255, 255, 255, 1)',
+                        backgroundColor: grayColor,
+                        borderColor: whiteColor,
                         borderWidth: 2
                     }, {
                         label: 'Your Total',
                         data: userTotalCarbonFootprintData,
                         type: 'line',
-                        backgroundColor: 'rgba(255, 255, 255, 1)',
-                        borderColor: 'rgba(63, 0, 125, 0.5)',
+                        backgroundColor: whiteColor,
+                        borderColor: darkPurpleColor,
                         borderWidth: 2
                     }, {
                         label: 'Average Total',
                         data: avgTotalCarbonFootprintData,
                         type: 'line',
-                        backgroundColor: 'rgba(255, 255, 255, 1)',
-                        borderColor: 'rgba(26, 100, 44, 0.5)',
+                        backgroundColor: whiteColor,
+                        borderColor: darkGreenColor,
                         borderWidth: 2
                     }]
                 },

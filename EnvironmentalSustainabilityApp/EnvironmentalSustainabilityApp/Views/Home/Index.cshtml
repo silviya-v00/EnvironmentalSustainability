@@ -75,7 +75,7 @@
                             <canvas id="pieChart" width="400" height="200"></canvas>
                         </div>
                         <div class="col result-col user-data" style="margin-left: 20px;">
-                            <p>Based on your answers, your estimated energy carbon footprint is<br/><strong>@ViewBag.UserTotalCarbonFootprint tonnes of CO<sub>2</sub> per year</strong>.</p>
+                            <p>Based on your answers, your estimated energy carbon footprint is<br /><strong>@ViewBag.UserTotalCarbonFootprint tonnes of CO<sub>2</sub> per year</strong>.</p>
                         </div>
                     </div>
                     <div class="row result-row">
@@ -188,7 +188,9 @@
 @section Scripts {
     @if (ViewBag.AllCategoriesCompleted)
     {
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.0.2/chartjs-plugin-annotation.min.js"></script>
         <script>
             var whiteColor = 'rgba(255, 255, 255, 1)';
             var purpleColor = 'rgba(176, 38, 250, 0.5)';
@@ -230,42 +232,26 @@
                 }
             });
 
-            var userTotalCarbonFootprintData = Array(@ViewBag.ChartLabels.Length).fill(@ViewBag.UserTotalCarbonFootprint);
-            var avgTotalCarbonFootprintData = Array(@ViewBag.ChartLabels.Length).fill(@ViewBag.AvgTotalCarbonFootprint);
-
             var barCtx = document.getElementById('barChart').getContext('2d');
             var barChart = new Chart(barCtx, {
                 type: 'bar',
                 data: {
                     labels: @Html.Raw(Json.Serialize(ViewBag.ChartLabels)),
                     datasets: [{
-                        label: 'Your By Category',
+                        label: 'Your',
                         data: @Html.Raw(Json.Serialize(ViewBag.ChartDataUser)),
                         backgroundColor: purpleColor,
                         borderColor: whiteColor,
                         borderWidth: 2
                     }, {
-                        label: 'Average By Category',
+                        label: 'Average',
                         data: @Html.Raw(Json.Serialize(ViewBag.ChartDataTotalAvg)),
                         backgroundColor: grayColor,
                         borderColor: whiteColor,
                         borderWidth: 2
-                    }, {
-                        label: 'Your Total',
-                        data: userTotalCarbonFootprintData,
-                        type: 'line',
-                        backgroundColor: whiteColor,
-                        borderColor: darkPurpleColor,
-                        borderWidth: 2
-                    }, {
-                        label: 'Average Total',
-                        data: avgTotalCarbonFootprintData,
-                        type: 'line',
-                        backgroundColor: whiteColor,
-                        borderColor: darkGreenColor,
-                        borderWidth: 2
                     }]
                 },
+                plugins: [ChartDataLabels],
                 options: {
                     responsive: false,
                     maintainAspectRatio: false,
@@ -276,11 +262,45 @@
                             font: {
                                 size: 16
                             }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top'
+                        },
+                        annotation: {
+                            annotations: [{
+                                type: 'line',
+                                mode: 'horizontal',
+                                scaleID: 'y',
+                                value: @Html.Raw(Json.Serialize(ViewBag.UserTotalCarbonFootprint)),
+                                borderColor: darkPurpleColor,
+                                borderWidth: 3,
+                                borderDash: [6, 6],
+                                label: {
+                                    content: 'Your Total: ' + @Html.Raw(Json.Serialize(ViewBag.UserTotalCarbonFootprint)),
+                                    enabled: true,
+                                    position: 'start'
+                                }
+                            }, {
+                                type: 'line',
+                                mode: 'horizontal',
+                                scaleID: 'y',
+                                value: @Html.Raw(Json.Serialize(ViewBag.AvgTotalCarbonFootprint)),
+                                borderColor: darkGreenColor,
+                                borderWidth: 3,
+                                borderDash: [6, 6],
+                                label: {
+                                    content: 'Average Total: ' + @Html.Raw(Json.Serialize(ViewBag.AvgTotalCarbonFootprint)),
+                                    enabled: true,
+                                    position: 'end'
+                                }
+                            }]
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
+                            suggestedMax: @Html.Raw(Json.Serialize(Math.Max(ViewBag.UserTotalCarbonFootprint, ViewBag.AvgTotalCarbonFootprint) + 1)),
                             title: {
                                 display: true,
                                 text: 'Carbon Footprint'
@@ -289,6 +309,7 @@
                     }
                 }
             });
+
         </script>
     }
 }

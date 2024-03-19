@@ -5,6 +5,8 @@
 @{
     string homeAction = "Index";
     bool showCarbonFootprintTest = false;
+    string controllerName = "";
+    string actionName = "";
 
     if (SignInManager.IsSignedIn(User))
     {
@@ -18,6 +20,9 @@
             homeAction = "Index";
             showCarbonFootprintTest = true;
         }
+
+        controllerName = ViewContext.RouteData.Values["Controller"].ToString();
+        actionName = ViewContext.RouteData.Values["Action"].ToString();
     }
 }
 
@@ -95,12 +100,12 @@
                     <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse" id="navbarNav">
                         <partial name="_LoginPartial" />
                         <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
+                            <li class="nav-item @(controllerName == "Home" && actionName == homeAction ? "active" : "")">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="@homeAction">Home</a>
                             </li>
                             @if (showCarbonFootprintTest)
                             {
-                                <li class="nav-item dropdown">
+                                <li class="nav-item dropdown @(controllerName == "CarbonFootprint" ? "active" : "")">
                                     <a class="nav-link dropdown-toggle text-dark" href="#" id="carbonFootprintDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Carbon Footprint
                                     </a>
@@ -111,7 +116,7 @@
                                         <a class="dropdown-item" asp-area="" asp-controller="CarbonFootprint" asp-action="WasteManagement">Waste Management</a>
                                     </div>
                                 </li>
-                                <li class="nav-item">
+                                <li class="nav-item @(controllerName == "Home" && actionName == "AirQuality" ? "active" : "")">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AirQuality">Air Quality</a>
                                 </li>
                             }

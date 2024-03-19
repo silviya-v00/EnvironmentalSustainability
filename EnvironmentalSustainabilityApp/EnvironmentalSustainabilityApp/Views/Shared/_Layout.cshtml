@@ -34,6 +34,7 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/confirm-pop-up.css" />
     <link rel="icon" type="image/x-icon" href="/images/leaf-favicon.ico">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -133,6 +134,9 @@
         </main>
     </div>
 
+    <div class="confirm-pop-up-overlay"></div>
+    <div class="confirm-pop-up-modal"></div>
+
     @if (SignInManager.IsSignedIn(User))
     {
         <footer class="footer">
@@ -144,6 +148,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/confirm-pop-up.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

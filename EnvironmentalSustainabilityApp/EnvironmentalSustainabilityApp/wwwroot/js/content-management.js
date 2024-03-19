@@ -4,6 +4,7 @@ $(document).ready(function () {
         $('#content-menu .nav-link').removeClass('active');
         $(this).addClass('active');
         ResetForm();
+        $("#delete-content").css("display", "none");
     });
 
     function ResetForm() {
@@ -60,6 +61,7 @@ $(document).ready(function () {
                 $('#ContentDescription').val(data.contentDescription);
                 $('#ContentLink').val(data.contentLink);
                 $('#IsContentActive').prop('checked', data.isContentActive);
+                $("#delete-content").css("display", "");
 
                 if (data.contentImageFileName) {
                     ShowHideImageOverlay(true);
@@ -153,13 +155,17 @@ $(document).ready(function () {
         }
     }
 
-    $('#delete-content').click(function () {
+    
+
+    $('#delete-content').click(async function () {
         var activeNavItem = $('.nav-link.active[data-content-id]');
 
         if (activeNavItem.length > 0) {
             var contentId = activeNavItem.data('content-id');
 
-            if (confirm('Are you sure you want to delete this content?')) {
+            const confirmed = await PopUpConfirm('Are you sure you want to delete this content?');
+
+            if (confirmed) {
                 $.ajax({
                     url: '/Home/DeleteContent',
                     type: 'POST',

@@ -44,6 +44,27 @@
             backdrop-filter: blur(5px);
         }
 
+        .dropdown-menu {
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 0.25rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .dropdown-item {
+            color: #333;
+            font-size: 14px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .dropdown-item:hover,
+            .dropdown-item:focus {
+                background-color: rgb(220 245 237);
+                color: #333;
+                text-decoration: none;
+            }
+
         .footer {
             padding: 10px 0;
             text-align: center;
@@ -63,7 +84,7 @@
 <body>
     @if (SignInManager.IsSignedIn(User))
     {
-        <header>
+        <header style="position: fixed; width: 100%; z-index: 1000; top: 0; height: 60px;">
             <nav class="navbar navbar-expand-sm navbar-toggleable-sm mb-3">
                 <div class="container">
                     <a class="navbar-brand text-dark" asp-area="" asp-controller="Home" asp-action="@homeAction">Green Life</a>
@@ -79,17 +100,16 @@
                             </li>
                             @if (showCarbonFootprintTest)
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="EnergyUsage">Energy Usage</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="Transportation">Transportation</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="FoodAndDiet">Food and Diet</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="CarbonFootprint" asp-action="WasteManagement">Waste Management</a>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="carbonFootprintDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Carbon Footprint
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="carbonFootprintDropdown">
+                                        <a class="dropdown-item" asp-area="" asp-controller="CarbonFootprint" asp-action="EnergyUsage">Energy Usage</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="CarbonFootprint" asp-action="Transportation">Transportation</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="CarbonFootprint" asp-action="FoodAndDiet">Food and Diet</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="CarbonFootprint" asp-action="WasteManagement">Waste Management</a>
+                                    </div>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AirQuality">Air Quality</a>
@@ -102,7 +122,7 @@
         </header>
     }
 
-    <div class="container" style="color: #343a40 !important; padding-bottom: 80px;">
+    <div class="container" style="color: #343a40 !important; padding-bottom: 80px; margin-top: 70px;">
         <main role="main" class="mt-4">
             @RenderBody()
         </main>

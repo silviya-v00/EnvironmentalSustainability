@@ -187,7 +187,8 @@ namespace EnvironmentalSustainabilityApp.Controllers
                         break;
                 }
 
-                drivingEmissions = (kilometersDrivenPerWeek * WeeksInYear * fuelEmissionsFactor) / numberOfVehicles;
+                if (numberOfVehicles != 0)
+                    drivingEmissions = (kilometersDrivenPerWeek * WeeksInYear * fuelEmissionsFactor) / numberOfVehicles;
 
                 double flightEmissions = flightsTakenPerYear * FlightAverageKm * FlightEmissionsFactor;
 

@@ -1,0 +1,11 @@
+USE [EnvironmentalSustainability]
+GO
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+               WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'FeaturedContent' AND COLUMN_NAME = 'LastUpdatedBy')
+BEGIN
+	ALTER TABLE dbo.FeaturedContent
+	ADD LastUpdatedBy nvarchar(450)
+	CONSTRAINT FK_FeaturedContent_AspNetUsers_LastUpdatedBy FOREIGN KEY (LastUpdatedBy) REFERENCES dbo.AspNetUsers(Id)
+END
+GO

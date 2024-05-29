@@ -276,7 +276,7 @@ namespace EnvironmentalSustainabilityApp.Utils
             return allContent;
         }
 
-        public void SaveContentToDatabase(FeaturedContent content, string imageFolderPath)
+        public void SaveContentToDatabase(FeaturedContent content, string imageFolderPath, string userID)
         {
             var sqlConn = new SqlConnection(_connectionString);
             sqlConn.Open();
@@ -297,6 +297,7 @@ namespace EnvironmentalSustainabilityApp.Utils
 		                               ContentDescription = @ContentDescription,
 		                               ContentLink = @ContentLink,
 		                               ContentImageFileName = @ContentImageFileName,
+		                               LastUpdatedBy = @LastUpdatedBy,
 		                               IsContentActive = @IsContentActive
 	                               WHERE ContentID = @ContentID
 
@@ -306,8 +307,8 @@ namespace EnvironmentalSustainabilityApp.Utils
                                END
                                ELSE
                                BEGIN
-	                               INSERT INTO dbo.FeaturedContent (ContentTitle, ContentDescription, ContentLink, ContentImageFileName, IsContentActive)
-	                               VALUES (@ContentTitle, @ContentDescription, @ContentLink, @ContentImageFileName, @IsContentActive)
+	                               INSERT INTO dbo.FeaturedContent (ContentTitle, ContentDescription, ContentLink, ContentImageFileName, LastUpdatedBy, IsContentActive)
+	                               VALUES (@ContentTitle, @ContentDescription, @ContentLink, @ContentImageFileName, @LastUpdatedBy, @IsContentActive)
                                END
 
 							   SELECT @OldContentImageFileName as OldContentImageFileName, @NewContentImageFileName as NewContentImageFileName";
@@ -342,6 +343,7 @@ namespace EnvironmentalSustainabilityApp.Utils
                     command.Parameters.Add("@ContentImageFileName", System.Data.SqlDbType.NVarChar).Value = DBNull.Value;
 
                 command.Parameters.Add("@IsContentActive", System.Data.SqlDbType.Bit).Value = content.IsContentActive;
+                command.Parameters.Add("@LastUpdatedBy", System.Data.SqlDbType.NVarChar).Value = userID;
 
                 SqlDataReader dataReader = command.ExecuteReader();
 

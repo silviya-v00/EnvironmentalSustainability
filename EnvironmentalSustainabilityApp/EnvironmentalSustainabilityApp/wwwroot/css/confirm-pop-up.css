@@ -27,6 +27,7 @@
 .confirm-pop-up-modal-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .confirm-pop-up-modal-body {
@@ -34,4 +35,10 @@
 
 .confirm-pop-up-close {
     cursor: pointer;
+    font-size: 35px;
+    margin-bottom: 8px;
 }
+
+    .confirm-pop-up-close:hover {
+        transform: scale(1.2);
+    }

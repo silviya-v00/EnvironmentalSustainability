@@ -387,7 +387,7 @@ namespace EnvironmentalSustainabilityApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveContent([FromForm] FeaturedContent content)
+        public async Task<IActionResult> SaveContent([FromForm] FeaturedContent content)
         {
             string imageFolderPath = _configuration["ImageFolderPath"];
 
@@ -403,7 +403,8 @@ namespace EnvironmentalSustainabilityApp.Controllers
                 }
             }
 
-            _dbUtil.SaveContentToDatabase(content, imageFolderPath);
+            var currentUser = await GetApplicationUser();
+            _dbUtil.SaveContentToDatabase(content, imageFolderPath, currentUser.Id);
             return Ok();
         }
 
